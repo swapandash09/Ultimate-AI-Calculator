@@ -1,87 +1,135 @@
-/* General Reset */
+/* Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
+/* Body Styling */
 body {
-    background-color: #1a1a1a;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: white;
 }
 
-/* Calculator Box */
+/* Calculator Container */
 .calculator {
-    width: 320px;
-    background: linear-gradient(135deg, #2c3e50, #4ca1af);
+    width: 350px;
+    background: #0f3460;
     padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
     text-align: center;
 }
 
-/* Display Screen */
-.display input {
+.calculator h2 {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+/* Display */
+#display {
     width: 100%;
-    height: 60px;
+    height: 50px;
+    font-size: 1.5em;
     text-align: right;
-    font-size: 2rem;
-    border: none;
-    outline: none;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
     padding: 10px;
-    border-radius: 10px;
-}
-
-/* Buttons Grid */
-.buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-top: 20px;
-}
-
-/* Buttons Styling */
-button {
-    height: 60px;
-    font-size: 1.5rem;
+    margin-bottom: 10px;
     border: none;
-    outline: none;
-    border-radius: 10px;
+    border-radius: 5px;
+    background: #16213e;
+    color: white;
+}
+
+/* Control Buttons */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.controls button {
+    flex: 1;
+    margin: 0 5px;
+    padding: 10px;
+    border: none;
+    background: #e94560;
+    color: white;
+    font-size: 14px;
+    border-radius: 5px;
     cursor: pointer;
     transition: 0.3s;
 }
 
-button:hover {
-    transform: scale(1.1);
+.controls button:hover {
+    background: #ff2e63;
 }
 
-/* Number & Operator Buttons */
-button:not(:nth-child(1)) {
-    background: rgba(255, 255, 255, 0.2);
+/* Calculator Buttons */
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.buttons button {
+    width: 100%;
+    height: 60px;
+    font-size: 1.3em;
+    border: none;
+    border-radius: 5px;
+    background: #1b1b2f;
     color: white;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-button:nth-child(1) {
-    background: red;
-    color: white;
+.buttons button:hover {
+    background: #0f3460;
 }
 
-/* Extra Buttons (Voice & Theme) */
-.extra-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
+#equal-btn {
+    grid-column: span 4;
+    background: #ff2e63;
 }
 
-.extra-buttons button {
-    width: 48%;
-    background: rgba(255, 255, 255, 0.3);
-    font-size: 1.2rem;
-    padding: 10px;
+#equal-btn:hover {
+    background: #e94560;
+}
+
+/* Extra Info */
+.extra {
+    margin-top: 10px;
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+/* Dark Theme */
+.dark-mode {
+    background: linear-gradient(135deg, #0b0b0d, #1c1c1c);
+}
+
+.dark-mode .calculator {
+    background: #121212;
+}
+
+.dark-mode .buttons button {
+    background: #222;
+}
+
+.dark-mode .controls button {
+    background: #333;
+}
+
+/* Responsive */
+@media (max-width: 400px) {
+    .calculator {
+        width: 90%;
+    }
 }

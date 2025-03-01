@@ -2,7 +2,7 @@
 const display = document.getElementById('display');
 const buttons = document.querySelectorAll('.buttons button');
 let currentInput = '0';
-let currentLang = 'en-IN';
+let currentLang = 'en-IN'; // Default Language English
 
 buttons.forEach(button => {
     button.addEventListener('click', () => {
@@ -27,57 +27,49 @@ buttons.forEach(button => {
 });
 
 // Voice Support
-const voiceToggle = document.getElementById('voiceToggle');
 let recognition;
-
 try {
     recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.continuous = true; // Mic hamesha active rahega
+    recognition.continuous = true; 
     recognition.interimResults = false;
-    recognition.lang = currentLang;
+    recognition.lang = currentLang; // Default English
 } catch (error) {
     console.error('SpeechRecognition not supported:', error);
     alert('Your browser does not support Speech Recognition. Use Chrome.');
 }
 
 let isVoiceActive = false;
-
-if (voiceToggle && recognition) {
-    voiceToggle.addEventListener('click', () => {
-        if (!isVoiceActive) {
-            startRecognition();
-            voiceToggle.classList.add('active');
-            speak('Voice control activated');
-        } else {
-            recognition.stop();
-            voiceToggle.classList.remove('active');
-            speak('Voice control stopped');
-            isVoiceActive = false;
-        }
-    });
-}
-
 function startRecognition() {
     if (!recognition) return;
     try {
+        recognition.lang = currentLang; // Ensure it picks the right language
         recognition.start();
         isVoiceActive = true;
-        console.log('Mic is ON, speak now...');
     } catch (error) {
         console.error('Mic start error:', error);
         speak('Mic failed to start, check permissions');
-        voiceToggle.classList.remove('active');
         isVoiceActive = false;
     }
 }
 
-// Voice Recognition Handling
 if (recognition) {
     recognition.onresult = (event) => {
         const command = event.results[0][0].transcript.toLowerCase();
         console.log('Heard:', command);
 
-        // Mathematical Expression Matching (e.g., "2 + 2")
+        // Language Change
+        if (command.includes('change language to hindi') || command.includes('भाषा हिंदी करें')) {
+            currentLang = 'hi-IN';
+            speak('भाषा हिंदी में बदली गई');
+        } else if (command.includes('change language to english')) {
+            currentLang = 'en-IN';
+            speak('Language changed to English');
+        } else if (command.includes('change language to bengali') || command.includes('বাংলায় পরিবর্তন করুন')) {
+            currentLang = 'bn-IN';
+            speak('ভাষা বাংলা তে পরিবর্তন হয়েছে');
+        }
+
+        // Mathematical Expression Matching
         const match = command.match(/(\d+)\s*([\+\-\*\/])\s*(\d+)/);
         if (match) {
             let num1 = match[1];
@@ -98,36 +90,29 @@ if (recognition) {
             }
         }
 
-        // Basic Commands
-        else if (command.includes('clear') || command.includes('saaf karo')) {
-            currentInput = '0';
-            speak('Cleared');
-            display.textContent = currentInput;
-        } else {
-            speak('Please repeat the command clearly.');
-        }
-
-        // Auto Restart Recognition for Continuous Mode
+        // Restart Voice Recognition
         recognition.stop();
-        if (isVoiceActive) setTimeout(startRecognition, 1000);
+        if (isVoiceActive) setTimeout(startRecognition, 500);
     };
 
     recognition.onerror = (event) => {
         console.error('Voice error:', event.error);
-        let errorMessage = 'Voice error, please try again';
-        if (event.error === 'no-speech') errorMessage = 'No speech detected, please speak';
-        else if (event.error === 'audio-capture') errorMessage = 'Mic not found, check your device';
-        else if (event.error === 'not-allowed') errorMessage = 'Mic permission denied, allow it';
-        speak(errorMessage);
-        voiceToggle.classList.remove('active');
+        speak('Voice recognition error, please try again');
         isVoiceActive = false;
     };
 
     recognition.onend = () => {
-        console.log('Voice recognition stopped');
-        if (isVoiceActive) setTimeout(startRecognition, 1000);
+        if (isVoiceActive) setTimeout(startRecognition, 500);
     };
 }
+
+// Theme Change Fix
+const themeButton = document.getElementById('themeButton');
+themeButton.addEventListener('click', () => {
+    document.body.classList.toggle('dark-theme');
+    speak('Theme changed');
+    setTimeout(startRecognition, 500);
+});
 
 // Text-to-Speech
 function speak(text) {
@@ -144,3 +129,6 @@ function speakResult(result) {
     const message = `The result is ${result}`;
     speak(message);
 }
+
+// Start Voice Recognition on Page Load
+startRecognition();

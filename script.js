@@ -1,164 +1,279 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Advanced Calculator</title>
-    <style>
-        body { text-align: center; font-family: Arial, sans-serif; transition: background 0.5s, color 0.5s; }
-        .dark-theme { background: #222; color: white; }
-        .light-theme { background: white; color: black; }
-        .colorful-theme { background: linear-gradient(45deg, #ff9800, #ff5722); color: white; }
-        .calculator { display: inline-block; padding: 20px; background: rgba(0, 0, 0, 0.1); border-radius: 10px; margin-top: 20px; }
-        button { font-size: 20px; margin: 5px; padding: 10px; }
-        #display { font-size: 24px; width: 100%; padding: 10px; text-align: right; border: none; }
-        .mic { font-size: 30px; cursor: pointer; padding: 10px; }
-    </style>
-</head>
-<body class="light-theme">
+// Calculator Logic
+const display = document.getElementById('display');
+const buttons = document.querySelectorAll('.buttons button');
+let currentInput = '0';
+let currentLang = 'en-IN';
 
-    <h1>Ultimate Advanced Calculator</h1>
-    <div class="calculator">
-        <input type="text" id="display" disabled>
-        <br>
-        <button onclick="clearDisplay()">C</button>
-        <button onclick="appendNumber('1')">1</button>
-        <button onclick="appendNumber('2')">2</button>
-        <button onclick="appendOperator('+')">+</button>
-        <br>
-        <button onclick="appendNumber('3')">3</button>
-        <button onclick="appendNumber('4')">4</button>
-        <button onclick="appendNumber('5')">5</button>
-        <button onclick="appendOperator('-')">-</button>
-        <br>
-        <button onclick="appendNumber('6')">6</button>
-        <button onclick="appendNumber('7')">7</button>
-        <button onclick="appendNumber('8')">8</button>
-        <button onclick="appendOperator('*')">*</button>
-        <br>
-        <button onclick="appendNumber('9')">9</button>
-        <button onclick="appendNumber('0')">0</button>
-        <button onclick="calculateResult()">=</button>
-        <button onclick="appendOperator('/')">/</button>
-        <br>
-        <button onclick="toggleTheme()">Change Theme</button>
-        <button onclick="changeLanguage()">Change Language</button>
-        <span class="mic" onclick="toggleVoice()">🎤</span>
-    </div>
+// Theme Initialization
+const themeCycle = document.getElementById('theme-cycle');
+const themes = ['light', 'dark', 'colorful'];
+let themeIndex = 0;
 
-    <script>
-        let currentLang = 'en-US';
-        let isVoiceActive = true;
-        let themes = ["light-theme", "dark-theme", "colorful-theme"];
-        let currentThemeIndex = 0;
-
-        function toggleTheme() {
-            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-            document.body.className = themes[currentThemeIndex];
-        }
-
-        function appendNumber(num) {
-            document.getElementById("display").value += num;
-            speak(num);
-        }
-
-        function appendOperator(op) {
-            document.getElementById("display").value += ` ${op} `;
-        }
-
-        function calculateResult() {
-            let expression = document.getElementById("display").value;
+buttons.forEach(button => {
+    button.addEventListener('click', () => {
+        const value = button.textContent;
+        if (value === 'C') {
+            currentInput = '0';
+            speak('Cleared');
+        } else if (value === '=') {
             try {
-                let result = eval(expression);
-                document.getElementById("display").value = result;
-                speak("The answer is " + result);
+                currentInput = eval(currentInput).toString();
+                speakResult(currentInput);
             } catch {
-                document.getElementById("display").value = "Error";
-                speak("Error");
+                currentInput = 'Error';
+                speak('Error in calculation');
             }
+        } else {
+            currentInput = currentInput === '0' ? value : currentInput + value;
+            speak(value);
+        }
+        display.textContent = currentInput;
+    });
+});
+
+// Theme Cycling
+themeCycle.addEventListener('click', () => {
+    themeIndex = (themeIndex + 1) % themes.length;
+    document.body.className = themes[themeIndex];
+    speak(`Theme changed to ${themes[themeIndex]}`);
+});
+
+// Language Cycling
+const langCycle = document.getElementById('lang-cycle');
+const languages = [
+    { code: 'en-IN', name: 'English' },
+    { code: 'hi-IN', name: 'Hindi' },
+    { code: 'bn-IN', name: 'Bengali' }
+];
+let langIndex = 0;
+
+langCycle.addEventListener('click', () => {
+    langIndex = (langIndex + 1) % languages.length;
+    currentLang = languages[langIndex].code;
+    if (recognition) recognition.lang = currentLang;
+    speak(`Language changed to ${languages[langIndex].name}`);
+});
+
+// Voice Support
+const voiceToggle = document.getElementById('voiceToggle');
+let recognition;
+
+try {
+    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.continuous = true; // Mic hamesha active
+    recognition.interimResults = false;
+    recognition.lang = currentLang;
+} catch (error) {
+    console.error('SpeechRecognition not supported:', error);
+    alert('Your browser does not support Speech Recognition. Use Chrome.');
+}
+
+let isVoiceActive = false;
+
+if (voiceToggle && recognition) {
+    voiceToggle.addEventListener('click', () => {
+        if (!isVoiceActive) {
+            startRecognition();
+            voiceToggle.classList.add('active');
+            speak('Voice control activated');
+        } else {
+            recognition.stop();
+            voiceToggle.classList.remove('active');
+            speak('Voice control stopped');
+            isVoiceActive = false;
+        }
+    });
+}
+
+function startRecognition() {
+    if (!recognition) return;
+    try {
+        recognition.start();
+        isVoiceActive = true;
+        console.log('Mic is ON, speak now...');
+    } catch (error) {
+        console.error('Mic start error:', error);
+        speak('Mic failed to start, check permissions');
+        voiceToggle.classList.remove('active');
+        isVoiceActive = false;
+    }
+}
+
+// Voice Recognition Handling
+if (recognition) {
+    recognition.onresult = (event) => {
+        const command = event.results[0][0].transcript.toLowerCase();
+        console.log('Heard:', command);
+
+        // Language Switching
+        if (command.includes('change to hindi') || command.includes('hindi mein badlo')) {
+            currentLang = 'hi-IN';
+            recognition.lang = currentLang;
+            langIndex = 1;
+            speak('भाषा हिंदी में बदल गई');
+        } else if (command.includes('change to english') || command.includes('english mein badlo')) {
+            currentLang = 'en-IN';
+            recognition.lang = currentLang;
+            langIndex = 0;
+            speak('Language changed to English');
+        } else if (command.includes('change to bengali') || command.includes('bangla mein badlo')) {
+            currentLang = 'bn-IN';
+            recognition.lang = currentLang;
+            langIndex = 2;
+            speak('ভাষা বাংলায় পরিবর্তন হয়েছে');
         }
 
-        function clearDisplay() {
-            document.getElementById("display").value = "";
-            speak("Cleared");
+        // Theme Switching
+        else if (command.includes('change theme') || command.includes('theme badlo')) {
+            themeIndex = (themeIndex + 1) % themes.length;
+            document.body.className = themes[themeIndex];
+            speak(`Theme changed to ${themes[themeIndex]}`);
         }
 
-        function changeLanguage() {
-            let langs = { "en-US": "hi-IN", "hi-IN": "bn-IN", "bn-IN": "en-US" };
-            currentLang = langs[currentLang];
-            speak("Language changed");
-        }
+        // Mathematical Expression Matching (e.g., "5 + 10")
+        const match = command.match(/(\d+)\s*([\+\-\*\/])\s*(\d+)/);
+        if (match) {
+            let num1 = match[1];
+            let operator = match[2];
+            let num2 = match[3];
 
-        function speak(text) {
-            if ('speechSynthesis' in window) {
-                let synth = window.speechSynthesis;
-                let utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = currentLang;
-                utterance.rate = 1;
-                synth.cancel();
-                synth.speak(utterance);
-            }
-        }
-
-        function toggleVoice() {
-            isVoiceActive = !isVoiceActive;
-            if (isVoiceActive) {
-                recognition.start();
-                speak("Voice activated");
-            } else {
-                recognition.stop();
-                speak("Voice deactivated");
-            }
-        }
-
-        // Voice Recognition (Always-On)
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = currentLang;
-        recognition.continuous = true;
-        recognition.interimResults = false;
-
-        recognition.onresult = function (event) {
-            let voiceText = event.results[event.results.length - 1][0].transcript.trim();
-            document.getElementById("display").value = voiceText;
-
-            if (voiceText.toLowerCase().includes("plus") || voiceText.includes("+")) {
-                voiceText = voiceText.replace(/plus/g, '+');
-            }
-            if (voiceText.toLowerCase().includes("minus") || voiceText.includes("-")) {
-                voiceText = voiceText.replace(/minus/g, '-');
-            }
-            if (voiceText.toLowerCase().includes("times") || voiceText.includes("*")) {
-                voiceText = voiceText.replace(/times/g, '*');
-            }
-            if (voiceText.toLowerCase().includes("divide") || voiceText.includes("/")) {
-                voiceText = voiceText.replace(/divide/g, '/');
-            }
+            currentInput = `${num1}${operator}${num2}`; // Removed spaces for eval
+            display.textContent = currentInput;
 
             try {
-                let result = eval(voiceText);
-                if (!isNaN(result)) {
-                    document.getElementById("display").value = result;
-                    speak("The answer is " + result);
+                currentInput = eval(currentInput).toString();
+                speakResult(currentInput);
+                display.textContent = currentInput;
+            } catch {
+                currentInput = 'Error';
+                speak('Error in calculation');
+                display.textContent = currentInput;
+            }
+        }
+
+        // Basic Commands
+        else if (command.includes('clear') || command.includes('saaf karo')) {
+            currentInput = '0';
+            speak('Cleared');
+            display.textContent = currentInput;
+        } else {
+            speak('Please repeat the command clearly');
+        }
+
+        // Auto Restart Recognition for Continuous Mode
+        recognition.stop();
+        if (isVoiceActive) setTimeout(startRecognition, 1000);
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Voice error:', event.error);
+        let errorMessage = 'Voice error, please try again';
+        if (event.error === 'no-speech') errorMessage = 'No speech detected, please speak';
+        else if (event.error === 'audio-capture') errorMessage = 'Mic not found, check your device';
+        else if (event.error === 'not-allowed') errorMessage = 'Mic permission denied, allow it';
+        speak(errorMessage);
+        voiceToggle.classList.remove('active');
+        isVoiceActive = false;
+    };
+
+    recognition.onend = () => {
+        console.log('Voice recognition stopped');
+        if (isVoiceActive) setTimeout(startRecognition, 1000);
+    };
+}
+
+// Text-to-Speech
+function speak(text) {
+    const translations = {
+        'en-IN': {
+            'Cleared': 'Cleared',
+            'Plus': 'Plus',
+            'Minus': 'Minus',
+            'Multiply': 'Multiply',
+            'Divide': 'Divide',
+            'Number': 'Number',
+            'Error in calculation': 'Error in calculation',
+            'Please repeat the command clearly': 'Please repeat the command clearly',
+            'Voice control activated': 'Voice control activated',
+            'Voice control stopped': 'Voice control stopped',
+            'Voice error, please try again': 'Voice error, please try again',
+            'Mic failed to start, check permissions': 'Mic failed to start, check permissions',
+            'No speech detected, please speak': 'No speech detected, please speak',
+            'Mic not found, check your device': 'Mic not found, check your device',
+            'Mic permission denied, allow it': 'Mic permission denied, allow it',
+            'Theme changed to light': 'Theme changed to light',
+            'Theme changed to dark': 'Theme changed to dark',
+            'Theme changed to colorful': 'Theme changed to colorful',
+            'Language changed to English': 'Language changed to English',
+            'Language changed to Hindi': 'Language changed to Hindi',
+            'Language changed to Bengali': 'Language changed to Bengali'
+        },
+        'hi-IN': {
+            'Cleared': 'साफ हो गया',
+            'Plus': 'जोड़',
+            'Minus': 'घटाव',
+            'Multiply': 'गुणा',
+            'Divide': 'भाग',
+            'Number': 'नंबर',
+            'Error in calculation': 'गणना में त्रुटि',
+            'Please repeat the command clearly': 'कृपया कमांड को स्पष्ट रूप से दोहराएं',
+            'Voice control activated': 'वॉइस कंट्रोल शुरू हो गया',
+            'Voice control stopped': 'वॉइस कंट्रोल बंद हो गया',
+            'Voice error, please try again': 'वॉइस में त्रुटि, कृपया फिर से कोशिश करें',
+            'Mic failed to start, check permissions': 'माइक शुरू करने में असफल, अनुमति जांचें',
+            'No speech detected, please speak': 'कोई आवाज नहीं मिली, कृपया बोलें',
+            'Mic not found, check your device': 'माइक नहीं मिला, अपने डिवाइस की जांच करें',
+            'Mic permission denied, allow it': 'माइक अनुमति अस्वीकृत, इसे अनुमति दें',
+            'Theme changed to light': 'थीम लाइट में बदल गई',
+            'Theme changed to dark': 'थीम डार्क में बदल गई',
+            'Theme changed to colorful': 'थीम रंगीन में बदल गई',
+            'Language changed to English': 'भाषा अंग्रेजी में बदल गई',
+            'Language changed to Hindi': 'भाषा हिंदी में बदल गई',
+            'Language changed to Bengali': 'भाषा बंगाली में बदल गई'
+        },
+        'bn-IN': {
+            'Cleared': 'পরিষ্কার হয়ে গেছে',
+            'Plus': 'যোগ',
+            'Minus': 'বিয়োগ',
+            'Multiply': 'গুণ',
+            'Divide': 'ভাগ',
+            'Number': 'নম্বর',
+            'Error in calculation': 'গণনায় ত্রুটি',
+            'Please repeat the command clearly': 'দয়া করে কমান্ডটি স্পষ্টভাবে পুনরাবৃত্তি করুন',
+            'Voice control activated': 'ভয়েস নিয়ন্ত্রণ চালু হয়েছে',
+            'Voice control stopped': 'ভয়েস নিয়ন্ত্রণ বন্ধ হয়েছে',
+            'Voice error, please try again': 'ভয়েসে ত্রুটি, আবার চেষ্টা করুন',
+            'Mic failed to start, check permissions': 'মাইক চালু করতে ব্যর্থ, অনুমতি পরীক্ষা করুন',
+            'No speech detected, please speak': 'কোনো শব্দ শনাক্ত হয়নি, বলুন',
+            'Mic not found, check your device': 'মাইক পাওয়া যায়নি, আপনার ডিভাইস চেক করুন',
+            'Mic permission denied, allow it': 'মাইকের অনুমতি প্রত্যাখ্যাত, এটি অনুমতি দিন',
+            'Theme changed to light': 'থিম লাইটে পরিবর্তন হয়েছে',
+            'Theme changed to dark': 'থিম গাঢ়ে পরিবর্তন হয়েছে',
+            'Theme changed to colorful': 'থিম রঙিনে পরিবর্তন হয়েছে',
+            'Language changed to English': 'ভাষা ইংরেজিতে পরিবর্তন হয়েছে',
+            'Language changed to Hindi': 'ভাষা হিন্দিতে পরিবর্তন হয়েছে',
+            'Language changed to Bengali': 'ভাষা বাংলায় পরিবর্তন হয়েছে'
+        }
+    };
+
+    const translatedText = translations[currentLang][text] || text;
+    const utterance = new SpeechSynthesisUtterance(translatedText);
+    utterance.lang = currentLang;
+    utterance.volume = 1;
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+    utterance.onstart = () => console.log('TTS started:', translatedText);
+    utterance.onend = () => console.log('TTS ended');
+    utterance.onerror = (e) => console.error('TTS error:', e.error);
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+}
+
+function speakResult(result) {
+    const messages = {
+        'en-IN': `The result is ${result}`,
+        'hi-IN': `जवाब है ${result}`,
+        'bn-IN': `ফলাফল হল ${result}`
+    };
+    speak(messages[currentLang]);
                 }
-            } catch (error) {
-                speak("Sorry, I didn't understand.");
-            }
-        };
-
-        recognition.onerror = function (event) {
-            console.error("Speech Recognition Error: ", event.error);
-            if (event.error === "not-allowed") {
-                speak("Please allow microphone access");
-            }
-        };
-
-        setInterval(() => {
-            if (isVoiceActive && !window.speechSynthesis.speaking) {
-                recognition.start();
-            }
-        }, 3000);
-
-        recognition.start();
-    </script>
-</body>
-</html>

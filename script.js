@@ -30,31 +30,6 @@ buttons.forEach(button => {
     });
 });
 
-// Theme Cycling
-const themeCycle = document.getElementById('theme-cycle');
-const themes = ['light', 'dark', 'colorful'];
-let themeIndex = 0;
-themeCycle.addEventListener('click', () => {
-    themeIndex = (themeIndex + 1) % themes.length;
-    document.body.className = themes[themeIndex];
-    speak(`Theme changed to ${themes[themeIndex]}`);
-});
-
-// Language Cycling
-const langCycle = document.getElementById('lang-cycle');
-const languages = [
-    { code: 'en-IN', name: 'English' },
-    { code: 'hi-IN', name: 'Hindi' },
-    { code: 'bn-IN', name: 'Bengali' }
-];
-let langIndex = 0;
-langCycle.addEventListener('click', () => {
-    langIndex = (langIndex + 1) % languages.length;
-    currentLang = languages[langIndex].code;
-    if (recognition) recognition.lang = currentLang;
-    speak(`Language changed to ${languages[langIndex].name}`);
-});
-
 // Voice Support
 const voiceToggle = document.getElementById('voiceToggle');
 let recognition;
@@ -65,7 +40,7 @@ try {
     recognition.lang = currentLang;
 } catch (error) {
     console.error('SpeechRecognition not supported:', error);
-    alert('Your browser does not support Speech Recognition. Please use Chrome.');
+    alert('Your browser does not support Speech Recognition. Use Chrome.');
 }
 
 let isVoiceActive = false;
@@ -104,33 +79,8 @@ if (recognition) {
         const command = event.results[0][0].transcript.toLowerCase();
         console.log('Heard:', command);
 
-        // Language Switching
-        if (command.includes('change to hindi') || command.includes('hindi mein badlo')) {
-            currentLang = 'hi-IN';
-            recognition.lang = currentLang;
-            langIndex = 1;
-            speak('भाषा हिंदी में बदल गई');
-        } else if (command.includes('change to english') || command.includes('english mein badlo')) {
-            currentLang = 'en-IN';
-            recognition.lang = currentLang;
-            langIndex = 0;
-            speak('Language changed to English');
-        } else if (command.includes('change to bengali') || command.includes('bangla mein badlo')) {
-            currentLang = 'bn-IN';
-            recognition.lang = currentLang;
-            langIndex = 2;
-            speak('ভাষা বাংলায় পরিবর্তন হয়েছে');
-        }
-
-        // Theme Control
-        else if (command.includes('change theme') || command.includes('theme badlo')) {
-            themeIndex = (themeIndex + 1) % themes.length;
-            document.body.className = themes[themeIndex];
-            speak(`Theme changed to ${themes[themeIndex]}`);
-        }
-
         // Number Input
-        else if (command.match(/\d+/) || command.includes('do') || command.includes('dui')) {
+        if (command.match(/\d+/) || command.includes('do') || command.includes('dui')) {
             const numberMap = {
                 'one': '1', 'two': '2', 'do': '2', 'dui': '2', 'three': '3', 'teen': '3', 'four': '4', 'char': '4', 'five': '5', 'paanch': '5', 'ten': '10', 'das': '10'
             };
@@ -144,39 +94,39 @@ if (recognition) {
         }
 
         // Operations
-        else if (command.includes('plus') || command.includes('jod') || command.includes('যোগ')) {
+        else if (command.includes('plus') || command.includes('jod')) {
             currentInput += '+';
             speak('Plus');
             display.textContent = currentInput;
-        } else if (command.includes('minus') || command.includes('ghata') || command.includes('বিয়োগ')) {
+        } else if (command.includes('minus') || command.includes('ghata')) {
             currentInput += '-';
             speak('Minus');
             display.textContent = currentInput;
-        } else if (command.includes('multiply') || command.includes('guna') || command.includes('গুণ')) {
+        } else if (command.includes('multiply') || command.includes('guna')) {
             currentInput += '*';
             speak('Multiply');
             display.textContent = currentInput;
-        } else if (command.includes('divide') || command.includes('bhag') || command.includes('ভাগ')) {
+        } else if (command.includes('divide') || command.includes('bhag')) {
             currentInput += '/';
             speak('Divide');
             display.textContent = currentInput;
-        } else if (command.includes('clear') || command.includes('saaf karo') || command.includes('পরিষ্কার')) {
+        } else if (command.includes('clear') || command.includes('saaf karo')) {
             currentInput = '0';
             speak('Cleared');
             display.textContent = currentInput;
         }
 
-        // Calculation Questions (e.g., "5 + 10 kitne hota hai")
+        // Calculation Questions
         else if (command.match(/\d+.*[+-/*].*\d+/)) {
             const numbers = command.match(/\d+/g);
             const num1 = numbers && numbers[0] ? numbers[0] : null;
             const num2 = numbers && numbers[1] ? numbers[1] : null;
             let operator = '';
 
-            if (command.includes('plus') || command.includes('jod') || command.includes('যোগ')) operator = '+';
-            else if (command.includes('minus') || command.includes('ghata') || command.includes('বিয়োগ')) operator = '-';
-            else if (command.includes('multiply') || command.includes('guna') || command.includes('গুণ')) operator = '*';
-            else if (command.includes('divide') || command.includes('bhag') || command.includes('ভাগ')) operator = '/';
+            if (command.includes('plus') || command.includes('jod')) operator = '+';
+            else if (command.includes('minus') || command.includes('ghata')) operator = '-';
+            else if (command.includes('multiply') || command.includes('guna')) operator = '*';
+            else if (command.includes('divide') || command.includes('bhag')) operator = '/';
 
             if (num1 && num2 && operator) {
                 currentInput = `${num1}${operator}${num2}`;
@@ -267,23 +217,6 @@ function speak(text) {
             'No speech detected, please speak': 'कोई आवाज नहीं मिली, कृपया बोलें',
             'Mic not found, check your device': 'माइक नहीं मिला, अपने डिवाइस की जांच करें',
             'Mic permission denied, allow it': 'माइक अनुमति अस्वीकृत, इसे अनुमति दें'
-        },
-        'bn-IN': {
-            'Cleared': 'পরিষ্কার হয়ে গেছে',
-            'Plus': 'যোগ',
-            'Minus': 'বিয়োগ',
-            'Multiply': 'গুণ',
-            'Divide': 'ভাগ',
-            'Number': 'নম্বর',
-            'Error in calculation': 'গণনায় ত্রুটি',
-            'Please say it again clearly': 'দয়া করে আবার স্পষ্টভাবে বলুন',
-            'Voice control activated': 'ভয়েস নিয়ন্ত্রণ চালু হয়েছে',
-            'Voice control stopped': 'ভয়েস নিয়ন্ত্রণ বন্ধ হয়েছে',
-            'Voice error, please try again': 'ভয়েসে ত্রুটি, আবার চেষ্টা করুন',
-            'Mic failed to start, check permissions': 'মাইক চালু করতে ব্যর্থ, অনুমতি পরীক্ষা করুন',
-            'No speech detected, please speak': 'কোনো শব্দ শনাক্ত হয়নি, বলুন',
-            'Mic not found, check your device': 'মাইক পাওয়া যায়নি, আপনার ডিভাইস চেক করুন',
-            'Mic permission denied, allow it': 'মাইকের অনুমতি প্রত্যাখ্যাত, এটি অনুমতি দিন'
         }
     };
 
@@ -304,8 +237,7 @@ function speak(text) {
 function speakResult(result) {
     const messages = {
         'en-IN': `The result is ${result}`,
-        'hi-IN': `जवाब है ${result}`,
-        'bn-IN': `ফলাফল হল ${result}`
+        'hi-IN': `जवाब है ${result}`
     };
     speak(messages[currentLang]);
 }

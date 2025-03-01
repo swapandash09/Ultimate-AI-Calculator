@@ -8,52 +8,35 @@
 </head>
 <body>
     <div class="calculator">
-        <h2>Ultimate AI Calculator</h2>
-        <input type="text" id="display" readonly>
-        
-        <!-- Control Buttons -->
-        <div class="controls">
-            <button id="voice-btn">🎤 Voice</button>
-            <button id="scan-btn">📷 Scan</button>
-            <button id="theme-btn">🌙 Theme</button>
-            <button id="lang-btn">🌐 Language</button>
-            <button id="mode-btn">🔄 Mode</button>
+        <div class="display">
+            <input type="text" id="result" disabled>
         </div>
-
-        <!-- Calculator Buttons -->
         <div class="buttons">
-            <button data-value="7">7</button>
-            <button data-value="8">8</button>
-            <button data-value="9">9</button>
-            <button data-value="/">÷</button>
+            <button class="btn" onclick="clearScreen()">C</button>
+            <button class="btn" onclick="appendValue('/')">/</button>
+            <button class="btn" onclick="appendValue('*')">*</button>
+            <button class="btn" onclick="appendValue('-')">-</button>
 
-            <button data-value="4">4</button>
-            <button data-value="5">5</button>
-            <button data-value="6">6</button>
-            <button data-value="*">×</button>
+            <button class="btn" onclick="appendValue('7')">7</button>
+            <button class="btn" onclick="appendValue('8')">8</button>
+            <button class="btn" onclick="appendValue('9')">9</button>
+            <button class="btn" onclick="appendValue('+')">+</button>
 
-            <button data-value="1">1</button>
-            <button data-value="2">2</button>
-            <button data-value="3">3</button>
-            <button data-value="-">−</button>
+            <button class="btn" onclick="appendValue('4')">4</button>
+            <button class="btn" onclick="appendValue('5')">5</button>
+            <button class="btn" onclick="appendValue('6')">6</button>
+            <button class="btn equal" onclick="calculate()">=</button>
 
-            <button data-value="0">0</button>
-            <button data-value=".">.</button>
-            <button data-value="clear">C</button>
-            <button data-value="+">+</button>
+            <button class="btn" onclick="appendValue('1')">1</button>
+            <button class="btn" onclick="appendValue('2')">2</button>
+            <button class="btn" onclick="appendValue('3')">3</button>
 
-            <button id="equal-btn" data-value="equals">=</button>
-        </div>
-
-        <!-- Additional Features -->
-        <div class="extra">
-            <p id="voice-status">🎤 Voice: Off</p>
-            <p id="theme-status">🌙 Theme: Light</p>
-            <p id="lang-status">🌐 Language: English</p>
-            <p id="mode-status">🔄 Mode: Standard</p>
+            <button class="btn" onclick="appendValue('0')">0</button>
+            <button class="btn" onclick="appendValue('.')">.</button>
+            <button class="btn scan" onclick="scanBill()">📸 Scan</button>
+            <button class="btn mic" onclick="startListening()">🎤</button>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>

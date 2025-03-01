@@ -3,205 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Voice Calculator</title>
+    <title>Ultimate Advanced Calculator</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #222;
-            color: white;
-        }
-        #calculator {
-            width: 300px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #333;
-            border-radius: 10px;
-        }
-        #display {
-            width: 100%;
-            height: 50px;
-            text-align: right;
-            font-size: 24px;
-            padding: 10px;
-            background: black;
-            color: white;
-            border: none;
-        }
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 20px;
-        }
-        button {
-            padding: 15px;
-            font-size: 18px;
-            background: #444;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:active {
-            background: #666;
-        }
-        #voiceToggle {
-            margin-top: 10px;
-            padding: 10px;
-            background: red;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
+        body { text-align: center; font-family: Arial, sans-serif; transition: background 0.5s, color 0.5s; }
+        .dark-theme { background: #222; color: white; }
+        .light-theme { background: white; color: black; }
+        .colorful-theme { background: linear-gradient(45deg, #ff9800, #ff5722); color: white; }
+        .calculator { display: inline-block; padding: 20px; background: rgba(0, 0, 0, 0.1); border-radius: 10px; margin-top: 20px; }
+        button { font-size: 20px; margin: 5px; padding: 10px; }
+        #display { font-size: 24px; width: 100%; padding: 10px; text-align: right; border: none; }
+        .mic { font-size: 30px; cursor: pointer; padding: 10px; }
     </style>
 </head>
-<body>
+<body class="light-theme">
 
-    <h1>AI Voice Calculator</h1>
-    <div id="calculator">
-        <input id="display" type="text" disabled>
-        <div class="buttons">
-            <button>7</button> <button>8</button> <button>9</button> <button>/</button>
-            <button>4</button> <button>5</button> <button>6</button> <button>*</button>
-            <button>1</button> <button>2</button> <button>3</button> <button>-</button>
-            <button>0</button> <button>C</button> <button>=</button> <button>+</button>
-        </div>
+    <h1>Ultimate Advanced Calculator</h1>
+    <div class="calculator">
+        <input type="text" id="display" disabled>
+        <br>
+        <button onclick="clearDisplay()">C</button>
+        <button onclick="appendNumber('1')">1</button>
+        <button onclick="appendNumber('2')">2</button>
+        <button onclick="appendOperator('+')">+</button>
+        <br>
+        <button onclick="appendNumber('3')">3</button>
+        <button onclick="appendNumber('4')">4</button>
+        <button onclick="appendNumber('5')">5</button>
+        <button onclick="appendOperator('-')">-</button>
+        <br>
+        <button onclick="appendNumber('6')">6</button>
+        <button onclick="appendNumber('7')">7</button>
+        <button onclick="appendNumber('8')">8</button>
+        <button onclick="appendOperator('*')">*</button>
+        <br>
+        <button onclick="appendNumber('9')">9</button>
+        <button onclick="appendNumber('0')">0</button>
+        <button onclick="calculateResult()">=</button>
+        <button onclick="appendOperator('/')">/</button>
+        <br>
+        <button onclick="toggleTheme()">Change Theme</button>
+        <button onclick="changeLanguage()">Change Language</button>
+        <span class="mic" onclick="toggleVoice()">🎤</span>
     </div>
-    <button id="voiceToggle">🎤 Voice Control</button>
 
     <script>
-        const display = document.getElementById('display');
-        const buttons = document.querySelectorAll('.buttons button');
-        let currentInput = '0';
-        let currentLang = 'en-IN';
+        let currentLang = 'en-US';
+        let isVoiceActive = true;
+        let themes = ["light-theme", "dark-theme", "colorful-theme"];
+        let currentThemeIndex = 0;
 
-        buttons.forEach(button => {
-            button.addEventListener('click', () => {
-                const value = button.textContent;
-                if (value === 'C') {
-                    currentInput = '0';
-                    speak('Cleared');
-                } else if (value === '=') {
-                    try {
-                        currentInput = eval(currentInput).toString();
-                        speakResult(currentInput);
-                    } catch {
-                        currentInput = 'Error';
-                        speak('Error in calculation');
-                    }
-                } else {
-                    currentInput = currentInput === '0' ? value : currentInput + value;
-                }
-                display.value = currentInput;
-            });
-        });
-
-        const voiceToggle = document.getElementById('voiceToggle');
-        let recognition;
-        try {
-            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.continuous = true;
-            recognition.lang = currentLang;
-        } catch (error) {
-            console.error('SpeechRecognition not supported:', error);
-            alert('Your browser does not support Speech Recognition. Use Chrome.');
+        function toggleTheme() {
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            document.body.className = themes[currentThemeIndex];
         }
 
-        let isVoiceActive = false;
-
-        voiceToggle.addEventListener('click', () => {
-            if (!isVoiceActive) {
-                startRecognition();
-                voiceToggle.textContent = "🎤 Listening...";
-                speak('Voice control activated');
-            } else {
-                recognition.stop();
-                voiceToggle.textContent = "🎤 Voice Control";
-                speak('Voice control stopped');
-                isVoiceActive = false;
-            }
-        });
-
-        function startRecognition() {
-            if (!recognition) return;
-            recognition.start();
-            isVoiceActive = true;
-            console.log('Mic is ON, speak now...');
+        function appendNumber(num) {
+            document.getElementById("display").value += num;
+            speak(num);
         }
 
-        recognition.onresult = (event) => {
-            const command = event.results[event.results.length - 1][0].transcript.toLowerCase();
-            console.log('Heard:', command);
+        function appendOperator(op) {
+            document.getElementById("display").value += ` ${op} `;
+        }
 
-            if (command.includes('clear') || command.includes('saaf karo')) {
-                currentInput = '0';
-                speak('Cleared');
-                display.value = currentInput;
-            } else if (command.includes('plus')) {
-                currentInput += '+';
-                speak('Plus');
-            } else if (command.includes('minus')) {
-                currentInput += '-';
-                speak('Minus');
-            } else if (command.includes('multiply')) {
-                currentInput += '*';
-                speak('Multiply');
-            } else if (command.includes('divide')) {
-                currentInput += '/';
-                speak('Divide');
-            } else if (command.match(/\d+.*[+\-*/].*\d+/)) {
-                try {
-                    currentInput = eval(command).toString();
-                    speakResult(currentInput);
-                    display.value = currentInput;
-                } catch {
-                    speak('Invalid calculation');
-                }
-            } else if (command.includes('equals') || command.includes('jawab') || command.includes('kitna hota hai')) {
-                try {
-                    currentInput = eval(currentInput).toString();
-                    speakResult(currentInput);
-                    display.value = currentInput;
-                } catch {
-                    speak('Error in calculation');
-                }
-            } else if (command.includes('change language to hindi')) {
-                currentLang = 'hi-IN';
-                recognition.lang = 'hi-IN';
-                speak('भाषा हिंदी में बदल दी गई');
-            } else if (command.includes('change language to english')) {
-                currentLang = 'en-IN';
-                recognition.lang = 'en-IN';
-                speak('Language changed to English');
-            } else if (command.includes('change theme')) {
-                document.body.style.backgroundColor = document.body.style.backgroundColor === 'black' ? '#222' : 'black';
-                speak('Theme changed');
+        function calculateResult() {
+            let expression = document.getElementById("display").value;
+            try {
+                let result = eval(expression);
+                document.getElementById("display").value = result;
+                speak("The answer is " + result);
+            } catch {
+                document.getElementById("display").value = "Error";
+                speak("Error");
             }
+        }
 
-            recognition.stop();
-            if (isVoiceActive) setTimeout(startRecognition, 1000);
-        };
+        function clearDisplay() {
+            document.getElementById("display").value = "";
+            speak("Cleared");
+        }
 
-        recognition.onerror = (event) => {
-            console.error('Voice error:', event.error);
-            speak('Voice error, please try again');
-            isVoiceActive = false;
-        };
+        function changeLanguage() {
+            let langs = { "en-US": "hi-IN", "hi-IN": "bn-IN", "bn-IN": "en-US" };
+            currentLang = langs[currentLang];
+            speak("Language changed");
+        }
 
         function speak(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = currentLang;
-            window.speechSynthesis.speak(utterance);
+            if ('speechSynthesis' in window) {
+                let synth = window.speechSynthesis;
+                let utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = currentLang;
+                utterance.rate = 1;
+                synth.cancel();
+                synth.speak(utterance);
+            }
         }
 
-        function speakResult(result) {
-            const messages = {
-                'en-IN': `The result is ${result}`,
-                'hi-IN': `जवाब है ${result}`
-            };
-            speak(messages[currentLang] || messages['en-IN']);
+        function toggleVoice() {
+            isVoiceActive = !isVoiceActive;
+            if (isVoiceActive) {
+                recognition.start();
+                speak("Voice activated");
+            } else {
+                recognition.stop();
+                speak("Voice deactivated");
+            }
         }
+
+        // Voice Recognition (Always-On)
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = currentLang;
+        recognition.continuous = true;
+        recognition.interimResults = false;
+
+        recognition.onresult = function (event) {
+            let voiceText = event.results[event.results.length - 1][0].transcript.trim();
+            document.getElementById("display").value = voiceText;
+
+            if (voiceText.toLowerCase().includes("plus") || voiceText.includes("+")) {
+                voiceText = voiceText.replace(/plus/g, '+');
+            }
+            if (voiceText.toLowerCase().includes("minus") || voiceText.includes("-")) {
+                voiceText = voiceText.replace(/minus/g, '-');
+            }
+            if (voiceText.toLowerCase().includes("times") || voiceText.includes("*")) {
+                voiceText = voiceText.replace(/times/g, '*');
+            }
+            if (voiceText.toLowerCase().includes("divide") || voiceText.includes("/")) {
+                voiceText = voiceText.replace(/divide/g, '/');
+            }
+
+            try {
+                let result = eval(voiceText);
+                if (!isNaN(result)) {
+                    document.getElementById("display").value = result;
+                    speak("The answer is " + result);
+                }
+            } catch (error) {
+                speak("Sorry, I didn't understand.");
+            }
+        };
+
+        recognition.onerror = function (event) {
+            console.error("Speech Recognition Error: ", event.error);
+            if (event.error === "not-allowed") {
+                speak("Please allow microphone access");
+            }
+        };
+
+        setInterval(() => {
+            if (isVoiceActive && !window.speechSynthesis.speaking) {
+                recognition.start();
+            }
+        }, 3000);
+
+        recognition.start();
     </script>
-
 </body>
 </html>

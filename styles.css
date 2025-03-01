@@ -20,7 +20,8 @@ body {
     padding: 25px;
     border-radius: 25px;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-    width: 360px;
+    width: 360px; /* Default width for desktop */
+    max-width: 100%; /* Ensures it scales down on mobile */
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -48,6 +49,7 @@ body.colorful {
     color: #fff;
     margin-bottom: 20px;
     box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.1);
+    overflow-x: auto; /* Scroll if number overflows on small screens */
 }
 
 .controls {
@@ -56,6 +58,7 @@ body.colorful {
     display: flex;
     justify-content: center;
     gap: 10px;
+    flex-wrap: wrap; /* Wrap buttons on small screens */
 }
 
 #theme-cycle, #lang-cycle {
@@ -77,6 +80,7 @@ body.colorful {
     grid-template-columns: repeat(4, 1fr);
     gap: 12px;
 }
+
 button {
     padding: 20px;
     font-size: 1.3em;
@@ -139,10 +143,26 @@ button:active {
     margin: 20px 0;
     text-align: center;
     color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Better spacing on mobile */
 }
-.bill-scanner label { font-size: 1.1em; margin-right: 10px; }
-#billInput { padding: 8px; border-radius: 10px; background: rgba(255, 255, 255, 0.2); color: #fff; border: none; }
-#billResult { margin-top: 10px; font-size: 1.2em; }
+.bill-scanner label { 
+    font-size: 1.1em; 
+    margin-right: 10px; 
+}
+#billInput { 
+    padding: 8px; 
+    border-radius: 10px; 
+    background: rgba(255, 255, 255, 0.2); 
+    color: #fff; 
+    border: none; 
+    width: 100%; /* Full width on mobile */
+}
+#billResult { 
+    margin-top: 10px; 
+    font-size: 1.2em; 
+}
 
 .footer {
     text-align: center;
@@ -151,7 +171,90 @@ button:active {
     font-size: 0.9em;
 }
 
-/* Responsive */
-@media (max-width: 400px) {
-    .calculator-container { width: 100%; margin: 15px; }
+/* Responsive Design for Mobile */
+@media (max-width: 768px) {
+    .calculator-container {
+        width: 90%; /* Scales to 90% of viewport width */
+        padding: 15px; /* Reduced padding for smaller screens */
+    }
+
+    .display {
+        font-size: 2em; /* Slightly smaller text */
+        padding: 15px;
+    }
+
+    .buttons {
+        grid-template-columns: repeat(4, 1fr); /* Maintains 4-column layout */
+        gap: 8px; /* Reduced gap for compactness */
+    }
+
+    button {
+        padding: 15px; /* Smaller buttons */
+        font-size: 1.1em;
+    }
+
+    .voice-btn {
+        top: 10px;
+        right: 10px;
+        width: 35px;
+        height: 35px;
+    }
+
+    .mic-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .bill-scanner {
+        margin: 15px 0;
+    }
+
+    #billInput {
+        font-size: 0.9em;
+    }
+
+    #billResult {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .calculator-container {
+        width: 95%; /* Almost full width on very small screens */
+        padding: 10px;
+    }
+
+    .display {
+        font-size: 1.5em; /* Further reduced for tiny screens */
+        padding: 10px;
+    }
+
+    .buttons {
+        grid-template-columns: repeat(4, 1fr); /* Still 4 columns, but tighter */
+        gap: 5px;
+    }
+
+    button {
+        padding: 12px;
+        font-size: 1em;
+    }
+
+    .controls {
+        gap: 5px;
+    }
+
+    #theme-cycle, #lang-cycle {
+        padding: 6px 12px;
+        font-size: 0.9em;
+    }
+
+    .voice-btn {
+        width: 30px;
+        height: 30px;
+    }
+
+    .mic-icon {
+        width: 18px;
+        height: 18px;
+    }
 }

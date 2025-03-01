@@ -201,7 +201,7 @@ recognition.onresult = (event) => {
     }
 
     recognition.stop();
-    if (isVoiceActive) setTimeout(startRecognition, 1500); // Increased delay for clarity
+    if (isVoiceActive) setTimeout(startRecognition, 1500);
 };
 
 recognition.onerror = (event) => {
@@ -281,7 +281,7 @@ function speak(text) {
     const utterance = new SpeechSynthesisUtterance(translatedText);
     utterance.lang = currentLang;
     utterance.volume = 1;
-    utterance.rate = 0.9; // Slightly slower for clarity
+    utterance.rate = 0.9;
     utterance.pitch = 1;
     utterance.onstart = () => console.log('TTS started:', translatedText);
     utterance.onend = () => console.log('TTS ended');

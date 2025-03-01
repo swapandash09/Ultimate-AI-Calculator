@@ -20,11 +20,7 @@ buttons.forEach(button => {
             }
         } else {
             currentInput = currentInput === '0' ? value : currentInput + value;
-            if (/^\d+$/.test(value)) speak(`Number ${value}`);
-            else if (value === '+') speak('Plus');
-            else if (value === '-') speak('Minus');
-            else if (value === '*') speak('Multiply');
-            else if (value === '/') speak('Divide');
+            speak(value);
         }
         display.textContent = currentInput;
     });
@@ -33,9 +29,10 @@ buttons.forEach(button => {
 // Voice Support
 const voiceToggle = document.getElementById('voiceToggle');
 let recognition;
+
 try {
     recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.continuous = false;
+    recognition.continuous = true; // Mic hamesha active rahega
     recognition.interimResults = false;
     recognition.lang = currentLang;
 } catch (error) {
@@ -74,94 +71,45 @@ function startRecognition() {
     }
 }
 
+// Voice Recognition Handling
 if (recognition) {
     recognition.onresult = (event) => {
         const command = event.results[0][0].transcript.toLowerCase();
         console.log('Heard:', command);
 
-        // Number Input
-        if (command.match(/\d+/) || command.includes('do') || command.includes('dui')) {
-            const numberMap = {
-                'one': '1', 'two': '2', 'do': '2', 'dui': '2', 'three': '3', 'teen': '3', 'four': '4', 'char': '4', 'five': '5', 'paanch': '5', 'ten': '10', 'das': '10'
-            };
-            const numWord = Object.keys(numberMap).find(word => command.includes(word));
-            const num = numWord ? numberMap[numWord] : (command.match(/\d+/) ? command.match(/\d+/)[0] : null);
-            if (num) {
-                currentInput = currentInput === '0' ? num : currentInput + num;
-                speak(`Number ${num}`);
-                display.textContent = currentInput;
-            }
-        }
+        // Mathematical Expression Matching (e.g., "2 + 2")
+        const match = command.match(/(\d+)\s*([\+\-\*\/])\s*(\d+)/);
+        if (match) {
+            let num1 = match[1];
+            let operator = match[2];
+            let num2 = match[3];
 
-        // Operations
-        else if (command.includes('plus') || command.includes('jod')) {
-            currentInput += '+';
-            speak('Plus');
+            currentInput = `${num1} ${operator} ${num2}`;
             display.textContent = currentInput;
-        } else if (command.includes('minus') || command.includes('ghata')) {
-            currentInput += '-';
-            speak('Minus');
-            display.textContent = currentInput;
-        } else if (command.includes('multiply') || command.includes('guna')) {
-            currentInput += '*';
-            speak('Multiply');
-            display.textContent = currentInput;
-        } else if (command.includes('divide') || command.includes('bhag')) {
-            currentInput += '/';
-            speak('Divide');
-            display.textContent = currentInput;
-        } else if (command.includes('clear') || command.includes('saaf karo')) {
-            currentInput = '0';
-            speak('Cleared');
-            display.textContent = currentInput;
-        }
 
-        // Calculation Questions
-        else if (command.match(/\d+.*[+-/*].*\d+/)) {
-            const numbers = command.match(/\d+/g);
-            const num1 = numbers && numbers[0] ? numbers[0] : null;
-            const num2 = numbers && numbers[1] ? numbers[1] : null;
-            let operator = '';
-
-            if (command.includes('plus') || command.includes('jod')) operator = '+';
-            else if (command.includes('minus') || command.includes('ghata')) operator = '-';
-            else if (command.includes('multiply') || command.includes('guna')) operator = '*';
-            else if (command.includes('divide') || command.includes('bhag')) operator = '/';
-
-            if (num1 && num2 && operator) {
-                currentInput = `${num1}${operator}${num2}`;
-                display.textContent = currentInput;
-                console.log('Expression:', currentInput);
-                try {
-                    currentInput = eval(currentInput).toString();
-                    speakResult(currentInput);
-                    display.textContent = currentInput;
-                    console.log('Result:', currentInput);
-                } catch {
-                    currentInput = 'Error';
-                    speak('Invalid calculation');
-                    display.textContent = currentInput;
-                }
-            } else {
-                speak('Please say it again clearly');
-            }
-        }
-
-        // Result Request
-        else if (command.includes('equals') || command.includes('result') || command.includes('jawab') || command.includes('kitna hota hai') || command.includes('kitne hote hain')) {
             try {
                 currentInput = eval(currentInput).toString();
                 speakResult(currentInput);
                 display.textContent = currentInput;
             } catch {
                 currentInput = 'Error';
-                speak('Invalid calculation');
+                speak('Error in calculation');
                 display.textContent = currentInput;
             }
         }
 
+        // Basic Commands
+        else if (command.includes('clear') || command.includes('saaf karo')) {
+            currentInput = '0';
+            speak('Cleared');
+            display.textContent = currentInput;
+        } else {
+            speak('Please repeat the command clearly.');
+        }
+
+        // Auto Restart Recognition for Continuous Mode
         recognition.stop();
-        if (isVoiceActive) setTimeout(startRecognition, 1500);
+        if (isVoiceActive) setTimeout(startRecognition, 1000);
     };
 
     recognition.onerror = (event) => {
@@ -177,67 +125,22 @@ if (recognition) {
 
     recognition.onend = () => {
         console.log('Voice recognition stopped');
-        if (isVoiceActive) setTimeout(startRecognition, 1500);
+        if (isVoiceActive) setTimeout(startRecognition, 1000);
     };
 }
 
 // Text-to-Speech
 function speak(text) {
-    const translations = {
-        'en-IN': {
-            'Cleared': 'Cleared',
-            'Plus': 'Plus',
-            'Minus': 'Minus',
-            'Multiply': 'Multiply',
-            'Divide': 'Divide',
-            'Number': 'Number',
-            'Error in calculation': 'Error in calculation',
-            'Please say it again clearly': 'Please say it again clearly',
-            'Voice control activated': 'Voice control activated',
-            'Voice control stopped': 'Voice control stopped',
-            'Voice error, please try again': 'Voice error, please try again',
-            'Mic failed to start, check permissions': 'Mic failed to start, check permissions',
-            'No speech detected, please speak': 'No speech detected, please speak',
-            'Mic not found, check your device': 'Mic not found, check your device',
-            'Mic permission denied, allow it': 'Mic permission denied, allow it'
-        },
-        'hi-IN': {
-            'Cleared': 'साफ हो गया',
-            'Plus': 'जोड़',
-            'Minus': 'घटाव',
-            'Multiply': 'गुणा',
-            'Divide': 'भाग',
-            'Number': 'नंबर',
-            'Error in calculation': 'गणना में त्रुटि',
-            'Please say it again clearly': 'कृपया फिर से स्पष्ट रूप से कहें',
-            'Voice control activated': 'वॉइस कंट्रोल शुरू हो गया',
-            'Voice control stopped': 'वॉइस कंट्रोल बंद हो गया',
-            'Voice error, please try again': 'वॉइस में त्रुटि, कृपया फिर से कोशिश करें',
-            'Mic failed to start, check permissions': 'माइक शुरू करने में असफल, अनुमति जांचें',
-            'No speech detected, please speak': 'कोई आवाज नहीं मिली, कृपया बोलें',
-            'Mic not found, check your device': 'माइक नहीं मिला, अपने डिवाइस की जांच करें',
-            'Mic permission denied, allow it': 'माइक अनुमति अस्वीकृत, इसे अनुमति दें'
-        }
-    };
-
-    const translatedText = translations[currentLang][text.split(' ')[0]] ? 
-        text.replace(text.split(' ')[0], translations[currentLang][text.split(' ')[0]]) : text;
-    const utterance = new SpeechSynthesisUtterance(translatedText);
+    const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = currentLang;
     utterance.volume = 1;
     utterance.rate = 0.9;
     utterance.pitch = 1;
-    utterance.onstart = () => console.log('TTS started:', translatedText);
-    utterance.onend = () => console.log('TTS ended');
-    utterance.onerror = (e) => console.error('TTS error:', e.error);
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
 }
 
 function speakResult(result) {
-    const messages = {
-        'en-IN': `The result is ${result}`,
-        'hi-IN': `जवाब है ${result}`
-    };
-    speak(messages[currentLang]);
+    const message = `The result is ${result}`;
+    speak(message);
 }

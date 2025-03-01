@@ -51,33 +51,42 @@ let langIndex = 0;
 langCycle.addEventListener('click', () => {
     langIndex = (langIndex + 1) % languages.length;
     currentLang = languages[langIndex].code;
-    recognition.lang = currentLang;
+    if (recognition) recognition.lang = currentLang;
     speak(`Language changed to ${languages[langIndex].name}`);
 });
 
 // Voice Support
 const voiceToggle = document.getElementById('voiceToggle');
-const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-recognition.continuous = false;
-recognition.interimResults = false;
-recognition.lang = currentLang;
+let recognition;
+try {
+    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = currentLang;
+} catch (error) {
+    console.error('SpeechRecognition not supported:', error);
+    alert('Your browser does not support Speech Recognition. Please use Chrome.');
+}
 
 let isVoiceActive = false;
 
-voiceToggle.addEventListener('click', () => {
-    if (!isVoiceActive) {
-        startRecognition();
-        voiceToggle.classList.add('active');
-        speak('Voice control activated');
-    } else {
-        recognition.stop();
-        voiceToggle.classList.remove('active');
-        speak('Voice control stopped');
-        isVoiceActive = false;
-    }
-});
+if (voiceToggle && recognition) {
+    voiceToggle.addEventListener('click', () => {
+        if (!isVoiceActive) {
+            startRecognition();
+            voiceToggle.classList.add('active');
+            speak('Voice control activated');
+        } else {
+            recognition.stop();
+            voiceToggle.classList.remove('active');
+            speak('Voice control stopped');
+            isVoiceActive = false;
+        }
+    });
+}
 
 function startRecognition() {
+    if (!recognition) return;
     try {
         recognition.start();
         isVoiceActive = true;
@@ -90,135 +99,137 @@ function startRecognition() {
     }
 }
 
-recognition.onresult = (event) => {
-    const command = event.results[0][0].transcript.toLowerCase();
-    console.log('Heard:', command);
+if (recognition) {
+    recognition.onresult = (event) => {
+        const command = event.results[0][0].transcript.toLowerCase();
+        console.log('Heard:', command);
 
-    // Language Switching
-    if (command.includes('change to hindi') || command.includes('hindi mein badlo')) {
-        currentLang = 'hi-IN';
-        recognition.lang = currentLang;
-        langIndex = 1;
-        speak('भाषा हिंदी में बदल गई');
-    } else if (command.includes('change to english') || command.includes('english mein badlo')) {
-        currentLang = 'en-IN';
-        recognition.lang = currentLang;
-        langIndex = 0;
-        speak('Language changed to English');
-    } else if (command.includes('change to bengali') || command.includes('bangla mein badlo')) {
-        currentLang = 'bn-IN';
-        recognition.lang = currentLang;
-        langIndex = 2;
-        speak('ভাষা বাংলায় পরিবর্তন হয়েছে');
-    }
+        // Language Switching
+        if (command.includes('change to hindi') || command.includes('hindi mein badlo')) {
+            currentLang = 'hi-IN';
+            recognition.lang = currentLang;
+            langIndex = 1;
+            speak('भाषा हिंदी में बदल गई');
+        } else if (command.includes('change to english') || command.includes('english mein badlo')) {
+            currentLang = 'en-IN';
+            recognition.lang = currentLang;
+            langIndex = 0;
+            speak('Language changed to English');
+        } else if (command.includes('change to bengali') || command.includes('bangla mein badlo')) {
+            currentLang = 'bn-IN';
+            recognition.lang = currentLang;
+            langIndex = 2;
+            speak('ভাষা বাংলায় পরিবর্তন হয়েছে');
+        }
 
-    // Theme Control
-    else if (command.includes('change theme') || command.includes('theme badlo')) {
-        themeIndex = (themeIndex + 1) % themes.length;
-        document.body.className = themes[themeIndex];
-        speak(`Theme changed to ${themes[themeIndex]}`);
-    }
+        // Theme Control
+        else if (command.includes('change theme') || command.includes('theme badlo')) {
+            themeIndex = (themeIndex + 1) % themes.length;
+            document.body.className = themes[themeIndex];
+            speak(`Theme changed to ${themes[themeIndex]}`);
+        }
 
-    // Number Input
-    else if (command.match(/\d+/) || command.includes('do') || command.includes('dui')) {
-        const numberMap = {
-            'one': '1', 'two': '2', 'do': '2', 'dui': '2', 'three': '3', 'teen': '3', 'four': '4', 'char': '4', 'five': '5', 'paanch': '5', 'ten': '10', 'das': '10'
-        };
-        const numWord = Object.keys(numberMap).find(word => command.includes(word));
-        const num = numWord ? numberMap[numWord] : (command.match(/\d+/) ? command.match(/\d+/)[0] : null);
-        if (num) {
-            currentInput = currentInput === '0' ? num : currentInput + num;
-            speak(`Number ${num}`);
+        // Number Input
+        else if (command.match(/\d+/) || command.includes('do') || command.includes('dui')) {
+            const numberMap = {
+                'one': '1', 'two': '2', 'do': '2', 'dui': '2', 'three': '3', 'teen': '3', 'four': '4', 'char': '4', 'five': '5', 'paanch': '5', 'ten': '10', 'das': '10'
+            };
+            const numWord = Object.keys(numberMap).find(word => command.includes(word));
+            const num = numWord ? numberMap[numWord] : (command.match(/\d+/) ? command.match(/\d+/)[0] : null);
+            if (num) {
+                currentInput = currentInput === '0' ? num : currentInput + num;
+                speak(`Number ${num}`);
+                display.textContent = currentInput;
+            }
+        }
+
+        // Operations
+        else if (command.includes('plus') || command.includes('jod') || command.includes('যোগ')) {
+            currentInput += '+';
+            speak('Plus');
+            display.textContent = currentInput;
+        } else if (command.includes('minus') || command.includes('ghata') || command.includes('বিয়োগ')) {
+            currentInput += '-';
+            speak('Minus');
+            display.textContent = currentInput;
+        } else if (command.includes('multiply') || command.includes('guna') || command.includes('গুণ')) {
+            currentInput += '*';
+            speak('Multiply');
+            display.textContent = currentInput;
+        } else if (command.includes('divide') || command.includes('bhag') || command.includes('ভাগ')) {
+            currentInput += '/';
+            speak('Divide');
+            display.textContent = currentInput;
+        } else if (command.includes('clear') || command.includes('saaf karo') || command.includes('পরিষ্কার')) {
+            currentInput = '0';
+            speak('Cleared');
             display.textContent = currentInput;
         }
-    }
 
-    // Operations
-    else if (command.includes('plus') || command.includes('jod') || command.includes('যোগ')) {
-        currentInput += '+';
-        speak('Plus');
-        display.textContent = currentInput;
-    } else if (command.includes('minus') || command.includes('ghata') || command.includes('বিয়োগ')) {
-        currentInput += '-';
-        speak('Minus');
-        display.textContent = currentInput;
-    } else if (command.includes('multiply') || command.includes('guna') || command.includes('গুণ')) {
-        currentInput += '*';
-        speak('Multiply');
-        display.textContent = currentInput;
-    } else if (command.includes('divide') || command.includes('bhag') || command.includes('ভাগ')) {
-        currentInput += '/';
-        speak('Divide');
-        display.textContent = currentInput;
-    } else if (command.includes('clear') || command.includes('saaf karo') || command.includes('পরিষ্কার')) {
-        currentInput = '0';
-        speak('Cleared');
-        display.textContent = currentInput;
-    }
+        // Calculation Questions (e.g., "5 + 10 kitne hota hai")
+        else if (command.match(/\d+.*[+-/*].*\d+/)) {
+            const numbers = command.match(/\d+/g);
+            const num1 = numbers && numbers[0] ? numbers[0] : null;
+            const num2 = numbers && numbers[1] ? numbers[1] : null;
+            let operator = '';
 
-    // Calculation Questions (e.g., "5 + 10 kitne hota hai")
-    else if (command.match(/\d+.*[+-/*].*\d+/)) {
-        const numbers = command.match(/\d+/g);
-        const num1 = numbers && numbers[0] ? numbers[0] : null;
-        const num2 = numbers && numbers[1] ? numbers[1] : null;
-        let operator = '';
+            if (command.includes('plus') || command.includes('jod') || command.includes('যোগ')) operator = '+';
+            else if (command.includes('minus') || command.includes('ghata') || command.includes('বিয়োগ')) operator = '-';
+            else if (command.includes('multiply') || command.includes('guna') || command.includes('গুণ')) operator = '*';
+            else if (command.includes('divide') || command.includes('bhag') || command.includes('ভাগ')) operator = '/';
 
-        if (command.includes('plus') || command.includes('jod') || command.includes('যোগ')) operator = '+';
-        else if (command.includes('minus') || command.includes('ghata') || command.includes('বিয়োগ')) operator = '-';
-        else if (command.includes('multiply') || command.includes('guna') || command.includes('গুণ')) operator = '*';
-        else if (command.includes('divide') || command.includes('bhag') || command.includes('ভাগ')) operator = '/';
+            if (num1 && num2 && operator) {
+                currentInput = `${num1}${operator}${num2}`;
+                display.textContent = currentInput;
+                console.log('Expression:', currentInput);
+                try {
+                    currentInput = eval(currentInput).toString();
+                    speakResult(currentInput);
+                    display.textContent = currentInput;
+                    console.log('Result:', currentInput);
+                } catch {
+                    currentInput = 'Error';
+                    speak('Invalid calculation');
+                    display.textContent = currentInput;
+                }
+            } else {
+                speak('Please say it again clearly');
+            }
+        }
 
-        if (num1 && num2 && operator) {
-            currentInput = `${num1}${operator}${num2}`;
-            display.textContent = currentInput;
-            console.log('Expression:', currentInput);
+        // Result Request
+        else if (command.includes('equals') || command.includes('result') || command.includes('jawab') || command.includes('kitna hota hai') || command.includes('kitne hote hain')) {
             try {
                 currentInput = eval(currentInput).toString();
                 speakResult(currentInput);
                 display.textContent = currentInput;
-                console.log('Result:', currentInput);
             } catch {
                 currentInput = 'Error';
                 speak('Invalid calculation');
                 display.textContent = currentInput;
             }
-        } else {
-            speak('Please say it again clearly');
         }
-    }
 
-    // Result Request
-    else if (command.includes('equals') || command.includes('result') || command.includes('jawab') || command.includes('kitna hota hai') || command.includes('kitne hote hain')) {
-        try {
-            currentInput = eval(currentInput).toString();
-            speakResult(currentInput);
-            display.textContent = currentInput;
-        } catch {
-            currentInput = 'Error';
-            speak('Invalid calculation');
-            display.textContent = currentInput;
-        }
-    }
+        recognition.stop();
+        if (isVoiceActive) setTimeout(startRecognition, 1500);
+    };
 
-    recognition.stop();
-    if (isVoiceActive) setTimeout(startRecognition, 1500);
-};
+    recognition.onerror = (event) => {
+        console.error('Voice error:', event.error);
+        let errorMessage = 'Voice error, please try again';
+        if (event.error === 'no-speech') errorMessage = 'No speech detected, please speak';
+        else if (event.error === 'audio-capture') errorMessage = 'Mic not found, check your device';
+        else if (event.error === 'not-allowed') errorMessage = 'Mic permission denied, allow it';
+        speak(errorMessage);
+        voiceToggle.classList.remove('active');
+        isVoiceActive = false;
+    };
 
-recognition.onerror = (event) => {
-    console.error('Voice error:', event.error);
-    let errorMessage = 'Voice error, please try again';
-    if (event.error === 'no-speech') errorMessage = 'No speech detected, please speak';
-    else if (event.error === 'audio-capture') errorMessage = 'Mic not found, check your device';
-    else if (event.error === 'not-allowed') errorMessage = 'Mic permission denied, allow it';
-    speak(errorMessage);
-    voiceToggle.classList.remove('active');
-    isVoiceActive = false;
-};
-
-recognition.onend = () => {
-    console.log('Voice recognition stopped');
-    if (isVoiceActive) setTimeout(startRecognition, 1500);
-};
+    recognition.onend = () => {
+        console.log('Voice recognition stopped');
+        if (isVoiceActive) setTimeout(startRecognition, 1500);
+    };
+}
 
 // Text-to-Speech
 function speak(text) {

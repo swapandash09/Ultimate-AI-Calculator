@@ -1,58 +1,41 @@
-// Select Elements
-const display = document.getElementById('display');
-const buttons = document.querySelectorAll('button');
-const voiceButton = document.getElementById('voice-btn');
-const themeButton = document.getElementById('theme-btn');
-const scanButton = document.getElementById('scan-btn');
+function appendValue(value) {
+    document.getElementById('result').value += value;
+}
 
-// Voice Recognition Setup
-const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-recognition.lang = 'en-US';
-recognition.continuous = false;
+function clearScreen() {
+    document.getElementById('result').value = '';
+}
 
-// Button Click Events
-buttons.forEach(button => {
-    button.addEventListener('click', (e) => {
-        const value = e.target.dataset.value;
+function calculate() {
+    try {
+        let result = eval(document.getElementById('result').value);
+        document.getElementById('result').value = result;
+        speak(result);
+    } catch (error) {
+        alert('Invalid Input');
+    }
+}
 
-        if (value === 'clear') {
-            display.value = '';
-        } else if (value === 'equals') {
-            try {
-                display.value = eval(display.value);
-                speakResult(display.value);
-            } catch {
-                display.value = 'Error';
-            }
-        } else {
-            display.value += value;
-        }
-    });
-});
-
-// Voice Command Feature
-voiceButton.addEventListener('click', () => {
+function startListening() {
+    let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'en-US';
     recognition.start();
-});
 
-recognition.onresult = (event) => {
-    const voiceInput = event.results[0][0].transcript;
-    display.value += voiceInput.replace(/\s/g, '');
-};
+    recognition.onresult = function(event) {
+        let voiceInput = event.results[0][0].transcript;
+        document.getElementById('result').value = voiceInput;
+    }
+}
 
-// Speak Out Result
-function speakResult(result) {
-    const speech = new SpeechSynthesisUtterance(result);
+function speak(text) {
+    let speech = new SpeechSynthesisUtterance();
     speech.lang = 'en-US';
+    speech.text = "The result is " + text;
+    speech.rate = 1;
+    speech.volume = 1;
     window.speechSynthesis.speak(speech);
 }
 
-// Theme Toggle Feature
-themeButton.addEventListener('click', () => {
-    document.body.classList.toggle('dark-theme');
-});
-
-// Scan Bill Feature (Placeholder - Actual OCR Implementation Required)
-scanButton.addEventListener('click', () => {
-    alert("Scan feature is under development.");
-});
+function scanBill() {
+    alert("Bill Scanner Feature Coming Soon...");
+}

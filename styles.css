@@ -13,10 +13,9 @@ body {
     background: linear-gradient(45deg, #1e90ff, #ff1493);
     transition: background 0.5s ease;
     padding: 10px;
-    overflow: hidden; /* Prevents scroll on animations */
+    overflow: hidden;
 }
 
-/* Catchy Background Animation */
 @keyframes gradientShift {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -29,10 +28,10 @@ body {
 
 .calculator-container {
     background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(15px); /* Enhanced blur for premium feel */
+    backdrop-filter: blur(15px);
     padding: 20px;
     border-radius: 35px;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35), inset 0 0 20px rgba(255, 255, 255, 0.1); /* Dual shadow */
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35), inset 0 0 20px rgba(255, 255, 255, 0.1);
     width: 100%;
     max-width: 400px;
     border: 2px solid rgba(255, 255, 255, 0.3);
@@ -41,10 +40,9 @@ body {
     transition: transform 0.3s ease;
 }
 .calculator-container:hover {
-    transform: scale(1.02); /* Subtle hover effect */
+    transform: scale(1.02);
 }
 
-/* Themes with Enhanced Gradients */
 body.dark {
     background: linear-gradient(45deg, #0f0c29, #302b63);
 }
@@ -74,13 +72,13 @@ body.colorful {
     text-align: right;
     font-size: 2.5em;
     color: #fff;
-    box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(255, 255, 255, 0.3); /* Glowing edge */
+    box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(255, 255, 255, 0.3);
     overflow-x: auto;
     width: 100%;
     transition: background 0.3s ease;
 }
 .display:hover {
-    background: rgba(255, 255, 255, 0.35); /* Catchy hover */
+    background: rgba(255, 255, 255, 0.35);
 }
 
 .controls {
@@ -105,7 +103,7 @@ body.colorful {
 }
 .control-btn:hover {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4));
-    transform: translateY(-2px); /* Lift effect */
+    transform: translateY(-2px);
 }
 .control-btn:active {
     transform: scale(0.95);
@@ -144,7 +142,7 @@ button::before {
 }
 button:hover::before {
     width: 200px;
-    height: 200px; /* Ripple effect */
+    height: 200px;
 }
 button:hover {
     background: rgba(255, 255, 255, 0.45);
@@ -158,9 +156,9 @@ button:active {
 .clear { background: linear-gradient(135deg, #ffa502, #ff6b6b); }
 .equals { background: linear-gradient(135deg, #45b7d1, #4ecdc4); }
 
-/* Mic Icon - Enhanced Design */
+/* Upgraded Mic Icon */
 .voice-btn {
-    background: linear-gradient(135deg, rgba(0, 255, 204, 0.8), rgba(0, 191, 255, 0.8));
+    background: linear-gradient(135deg, #00ffcc, #00b8ff); /* Vibrant gradient */
     border-radius: 50%;
     width: 50px;
     height: 50px;
@@ -172,28 +170,32 @@ button:active {
     left: 10px;
     cursor: pointer;
     transition: all 0.4s ease;
-    box-shadow: 0 5px 20px rgba(0, 255, 204, 0.5), inset 0 0 5px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 5px 20px rgba(0, 255, 204, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.5);
 }
 .voice-btn:hover {
-    transform: scale(1.1);
-    background: linear-gradient(135deg, rgba(0, 255, 204, 1), rgba(0, 191, 255, 1));
+    transform: scale(1.15);
+    background: linear-gradient(135deg, #00ffcc, #00eaff);
+    box-shadow: 0 8px 25px rgba(0, 255, 204, 0.8);
 }
 .voice-btn.active {
-    background: linear-gradient(135deg, rgba(255, 105, 180, 0.9), rgba(0, 255, 204, 0.9));
-    animation: pulse 1.5s infinite;
+    background: linear-gradient(135deg, #ff69b4, #00ffcc);
+    animation: micPulse 1.5s infinite;
 }
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7); }
-    70% { box-shadow: 0 0 0 15px rgba(255, 105, 180, 0); }
+@keyframes micPulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.8); }
+    70% { box-shadow: 0 0 0 20px rgba(255, 105, 180, 0); }
     100% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0); }
 }
 .mic-icon {
-    font-size: 24px;
-    color: #fff;
+    width: 24px;
+    height: 24px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 14c1.66 0 3-1.31 3-2.97v-7.02c0-1.66-1.34-3-3-3s-3 1.34-3 3v7.02c0 1.66 1.34 2.97 3 2.97zM6.5 11.5v2h-2v-2h2zm13 0v2h-2v-2h2zm-7-10.5c2.21 0 4 1.79 4 4v7c0 2.21-1.79 4-4 4s-4-1.79-4-4v-7c0-2.21 1.79-4 4-4zm0 14c1.38 0 2.5-1.12 2.5-2.5v-7c0-1.38-1.12-2.5-2.5-2.5s-2.5 1.12-2.5 2.5v7c0 1.38 1.12 2.5 2.5 2.5zm-5 2v2h10v-2h-10z"/></svg>') no-repeat center;
+    background-size: contain;
     transition: transform 0.4s ease;
 }
 .voice-btn.active .mic-icon {
-    transform: rotate(360deg) scale(1.2);
+    transform: scale(1.2) rotate(45deg); /* Unique spin */
 }
 
 .bill-scanner {
@@ -227,6 +229,22 @@ button:active {
     padding: 5px 10px; 
     border-radius: 10px;
 }
+.scan-status {
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(0, 255, 204, 0.2);
+    padding: 5px 10px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+.scan-status.scanning {
+    background: rgba(255, 215, 0, 0.3);
+    color: #fff;
+}
+.scan-status.complete {
+    background: rgba(0, 255, 0, 0.3);
+    color: #fff;
+}
 
 .footer {
     text-align: center;
@@ -239,7 +257,7 @@ button:active {
     border-radius: 10px;
 }
 
-/* Responsive Design for Mobile */
+/* Responsive Design */
 @media (max-width: 768px) {
     .calculator-container {
         width: 90%;
@@ -261,7 +279,8 @@ button:active {
         height: 40px;
     }
     .mic-icon {
-        font-size: 20px;
+        width: 20px;
+        height: 20px;
     }
 }
 
@@ -293,6 +312,7 @@ button:active {
         height: 35px;
     }
     .mic-icon {
-        font-size: 18px;
+        width: 18px;
+        height: 18px;
     }
-}
+                     }

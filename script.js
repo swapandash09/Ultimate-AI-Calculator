@@ -147,6 +147,20 @@ if (recognition) {
             speak(`Theme changed to ${themes[themeIndex]}`);
         }
 
+        // Current Time (Abhi to bole)
+        else if (command.includes('abhi to bole') || command.includes('current time') || command.includes('time bolo')) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString(currentLang === 'en-IN' ? 'en-US' : currentLang);
+            currentInput = timeString;
+            display.textContent = currentInput;
+            const timeMessages = {
+                'en-IN': `The current time is ${timeString}`,
+                'hi-IN': `अभी का समय है ${timeString}`,
+                'bn-IN': `বর্তমান সময় হল ${timeString}`
+            };
+            speak(timeMessages[currentLang]);
+        }
+
         // Mathematical Expression Matching (e.g., "5 + 10")
         const match = command.match(/(\d+)\s*([\+\-\*\/])\s*(\d+)/);
         if (match) {
@@ -317,15 +331,14 @@ billInput.addEventListener('change', async (event) => {
     img.onload = async () => {
         try {
             const { data: { text } } = await Tesseract.recognize(img, 'eng', {
-                tessedit_char_whitelist: '0123456789₹$.TotalAMOUNT', // Focus on numbers and key terms
-                tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK, // Better for handwritten
-                oem: Tesseract.OEM.LSTM_ONLY // Improved for handwritten text
+                tessedit_char_whitelist: '0123456789₹$.TotalAMOUNT',
+                tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
+                oem: Tesseract.OEM.LSTM_ONLY
             });
             console.log('Bill text:', text);
 
-            // Extract total from handwritten bill
             const totalMatch = text.match(/(?:Total|TOTAL|Amount|AMOUNT)[:\s]*[₹$]?(\d+(?:\.\d{1,2})?)/i) ||
-                              text.match(/(\d+(?:\.\d{1,2})?)$/); // Fallback to last number if "Total" not found
+                              text.match(/(\d+(?:\.\d{1,2})?)$/);
             const total = totalMatch ? totalMatch[1] : 'Not Found';
             billResult.textContent = `Total: ${total}`;
 

@@ -12,7 +12,8 @@ body {
     min-height: 100vh;
     background: linear-gradient(45deg, #1e90ff, #ff1493);
     transition: background 0.5s ease;
-    padding: 10px;
+    padding: 0; /* Removed padding for full edge fit */
+    margin: 0;
     overflow: hidden;
 }
 
@@ -44,7 +45,7 @@ body {
 }
 .intro.hidden {
     opacity: 0;
-    pointer-events: none; /* Prevents interaction after fade */
+    pointer-events: none;
 }
 .intro-title {
     font-size: 3.5em;
@@ -80,19 +81,18 @@ body {
 .calculator-container {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(15px);
-    padding: 20px;
-    border-radius: 35px;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35), inset 0 0 20px rgba(255, 255, 255, 0.1);
-    width: 100%;
-    max-width: 400px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 10px; /* Reduced padding for full fit */
+    border-radius: 0; /* Removed border-radius for edge-to-edge */
+    box-shadow: none; /* Simplified for mobile app feel */
+    width: 100vw; /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+    border: none;
     position: relative;
     overflow: hidden;
-    transition: transform 0.3s ease;
-    animation: slideUp 0.5s ease forwards; /* Appears after intro */
-}
-.calculator-container:hover {
-    transform: scale(1.02);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    animation: slideUp 0.5s ease forwards;
 }
 @keyframes slideUp {
     0% { opacity: 0; transform: translateY(50px); }
@@ -117,33 +117,27 @@ body.colorful {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    position: relative;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .display {
-    background: rgba(255, 255, 255, 0.25);
+    background: none;
     padding: 15px;
-    border-radius: 15px;
     text-align: right;
     font-size: 2.5em;
     color: #fff;
-    box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(255, 255, 255, 0.3);
     overflow-x: auto;
     width: 100%;
-    transition: background 0.3s ease;
-}
-.display:hover {
-    background: rgba(255, 255, 255, 0.35);
+    flex-grow: 1; /* Takes available space */
 }
 
 .controls {
-    text-align: center;
-    margin-bottom: 20px;
     display: flex;
     justify-content: center;
     gap: 10px;
-    flex-wrap: wrap;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .control-btn {
@@ -168,37 +162,21 @@ body.colorful {
 .buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    gap: 5px; /* Tightened gap */
+    padding: 10px;
+    flex-grow: 2; /* Takes remaining space */
 }
 
 button {
     padding: 15px;
-    font-size: 1.3em;
+    font-size: 1.5em; /* Slightly larger for mobile */
     border: none;
-    border-radius: 15px;
+    border-radius: 10px;
     background: rgba(255, 255, 255, 0.3);
     color: #fff;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25), inset 0 0 5px rgba(255, 255, 255, 0.2);
-    position: relative;
-    overflow: hidden;
-}
-button::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.6s ease, height 0.6s ease;
-}
-button:hover::before {
-    width: 200px;
-    height: 200px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
 }
 button:hover {
     background: rgba(255, 255, 255, 0.45);
@@ -215,8 +193,8 @@ button:active {
 .voice-btn {
     background: linear-gradient(135deg, #00ffcc, #00b8ff);
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 40px; /* Adjusted for mobile */
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -225,13 +203,12 @@ button:active {
     left: 10px;
     cursor: pointer;
     transition: all 0.4s ease;
-    box-shadow: 0 5px 20px rgba(0, 255, 204, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.4);
+    box-shadow: 0 5px 20px rgba(0, 255, 204, 0.6);
     border: 2px solid rgba(255, 255, 255, 0.5);
 }
 .voice-btn:hover {
     transform: scale(1.15);
     background: linear-gradient(135deg, #00ffcc, #00eaff);
-    box-shadow: 0 8px 25px rgba(0, 255, 204, 0.8);
 }
 .voice-btn.active {
     background: linear-gradient(135deg, #ff69b4, #00ffcc);
@@ -243,8 +220,8 @@ button:active {
     100% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0); }
 }
 .mic-icon {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 14c1.66 0 3-1.31 3-2.97v-7.02c0-1.66-1.34-3-3-3s-3 1.34-3 3v7.02c0 1.66 1.34 2.97 3 2.97zM6.5 11.5v2h-2v-2h2zm13 0v2h-2v-2h2zm-7-10.5c2.21 0 4 1.79 4 4v7c0 2.21-1.79 4-4 4s-4-1.79-4-4v-7c0-2.21 1.79-4 4-4zm0 14c1.38 0 2.5-1.12 2.5-2.5v-7c0-1.38-1.12-2.5-2.5-2.5s-2.5 1.12-2.5 2.5v7c0 1.38 1.12 2.5 2.5 2.5zm-5 2v2h10v-2h-10z"/></svg>') no-repeat center;
     background-size: contain;
     transition: transform 0.4s ease;
@@ -254,15 +231,16 @@ button:active {
 }
 
 .bill-scanner {
-    margin: 20px 0;
+    padding: 10px;
     text-align: center;
     color: #fff;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px; /* Reduced gap */
+    background: rgba(255, 255, 255, 0.05);
 }
 .bill-scanner label { 
-    font-size: 1.1em; 
+    font-size: 1em; /* Adjusted for mobile */
     text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 #billInput { 
@@ -272,25 +250,23 @@ button:active {
     color: #fff; 
     border: none; 
     width: 100%;
-    transition: background 0.3s ease;
 }
 #billInput:hover {
     background: rgba(255, 255, 255, 0.35);
 }
 #billResult { 
-    margin-top: 10px; 
-    font-size: 1.2em; 
+    margin-top: 5px; 
+    font-size: 1em; 
     background: rgba(255, 255, 255, 0.1); 
-    padding: 5px 10px; 
+    padding: 5px; 
     border-radius: 10px;
 }
 .scan-status {
-    font-size: 0.9em;
+    font-size: 0.8em;
     color: rgba(255, 255, 255, 0.8);
     background: rgba(0, 255, 204, 0.2);
-    padding: 5px 10px;
+    padding: 5px;
     border-radius: 8px;
-    transition: all 0.3s ease;
 }
 .scan-status.scanning {
     background: rgba(255, 215, 0, 0.3);
@@ -303,13 +279,11 @@ button:active {
 
 .footer {
     text-align: center;
-    margin-top: 20px;
+    padding: 5px;
     color: rgba(255, 255, 255, 0.9);
-    font-size: 0.9em;
+    font-size: 0.8em;
     text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     background: rgba(255, 255, 255, 0.05);
-    padding: 5px;
-    border-radius: 10px;
 }
 
 /* Responsive Design */
@@ -320,28 +294,11 @@ button:active {
     .intro-tagline {
         font-size: 1.2em;
     }
-    .calculator-container {
-        width: 90%;
-        padding: 15px;
-    }
     .display {
         font-size: 2em;
-        padding: 12px;
-    }
-    .buttons {
-        gap: 8px;
     }
     button {
-        padding: 12px;
-        font-size: 1.1em;
-    }
-    .voice-btn {
-        width: 40px;
-        height: 40px;
-    }
-    .mic-icon {
-        width: 20px;
-        height: 20px;
+        font-size: 1.3em;
     }
 }
 
@@ -352,34 +309,14 @@ button:active {
     .intro-tagline {
         font-size: 1em;
     }
-    .calculator-container {
-        width: 95%;
-        padding: 10px;
-    }
     .display {
-        font-size: 1.5em;
-        padding: 10px;
-    }
-    .buttons {
-        gap: 5px;
+        font-size: 1.8em; /* Adjusted for smaller screens */
     }
     button {
-        padding: 10px;
-        font-size: 1em;
-    }
-    .controls {
-        gap: 5px;
+        font-size: 1.2em;
     }
     .control-btn {
         padding: 6px 12px;
         font-size: 0.9em;
     }
-    .voice-btn {
-        width: 35px;
-        height: 35px;
-    }
-    .mic-icon {
-        width: 18px;
-        height: 18px;
-    }
-    }
+}

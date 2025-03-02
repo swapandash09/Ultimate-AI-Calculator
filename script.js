@@ -241,7 +241,8 @@ function speak(text) {
             'Language changed to Hindi': 'Language changed to Hindi',
             'Language changed to Bengali': 'Language changed to Bengali',
             'Scanning bill': 'Scanning bill',
-            'Error scanning bill': 'Error scanning bill'
+            'Error scanning bill': 'Error scanning bill',
+            'Scan complete': 'Scan complete'
         },
         'hi-IN': {
             'Cleared': 'साफ हो गया',
@@ -266,7 +267,8 @@ function speak(text) {
             'Language changed to Hindi': 'भाषा हिंदी में बदल गई',
             'Language changed to Bengali': 'भाषा बंगाली में बदल गई',
             'Scanning bill': 'बिल स्कैन हो रहा है',
-            'Error scanning bill': 'बिल स्कैन करने में त्रुटि'
+            'Error scanning bill': 'बिल स्कैन करने में त्रुटि',
+            'Scan complete': 'स्कैन पूरा हुआ'
         },
         'bn-IN': {
             'Cleared': 'পরিষ্কার হয়ে গেছে',
@@ -291,7 +293,8 @@ function speak(text) {
             'Language changed to Hindi': 'ভাষা হিন্দিতে পরিবর্তন হয়েছে',
             'Language changed to Bengali': 'ভাষা বাংলায় পরিবর্তন হয়েছে',
             'Scanning bill': 'বিল স্ক্যান হচ্ছে',
-            'Error scanning bill': 'বিল স্ক্যান করতে ত্রুটি'
+            'Error scanning bill': 'বিল স্ক্যান করতে ত্রুটি',
+            'Scan complete': 'স্ক্যান সম্পূর্ণ'
         }
     };
 
@@ -317,24 +320,35 @@ function speakResult(result) {
     speak(messages[currentLang]);
 }
 
-// Smart Bill Scanner (Handwritten Detection)
+// Smart Bill Scanner (Instant Scan with Feedback)
 const billInput = document.getElementById('billInput');
 const billResult = document.getElementById('billResult');
+const scanStatus = document.getElementById('scanStatus');
 
 billInput.addEventListener('change', async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
+    // Scanning Feedback
+    scanStatus.textContent = translations[currentLang]['Scanning bill'] || 'Scanning bill';
+    scanStatus.classList.add('scanning');
     speak('Scanning bill');
+
     const img = new Image();
     img.src = URL.createObjectURL(file);
     img.onload = async () => {
         try {
-            const { data: { text } } = await Tesseract.recognize(img, 'eng', {
-                tessedit_char_whitelist: '0123456789₹$.TotalAMOUNT',
-                tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
-                oem: Tesseract.OEM.LSTM_ONLY
+            const worker = await Tesseract.createWorker('eng', Tesseract.OEM.LSTM_ONLY, {
+                workerPath: 'https://unpkg.com/tesseract.js@v5.0.4/dist/worker.min.js',
+                langPath: 'https://tessdata.projectnaptha.com/4.0.0_best',
+                corePath: 'https://unpkg.com/tesseract.js-core@v5.0.0/tesseract-core.wasm.js',
             });
+            await worker.setParameters({
+                tessedit_char_whitelist: '0123456789₹$.TotalAMOUNT',
+                tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK
+            });
+
+            const { data: { text } } = await worker.recognize(img);
             console.log('Bill text:', text);
 
             const totalMatch = text.match(/(?:Total|TOTAL|Amount|AMOUNT)[:\s]*[₹$]?(\d+(?:\.\d{1,2})?)/i) ||
@@ -342,21 +356,31 @@ billInput.addEventListener('change', async (event) => {
             const total = totalMatch ? totalMatch[1] : 'Not Found';
             billResult.textContent = `Total: ${total}`;
 
+            // Scan Complete Feedback
+            scanStatus.textContent = translations[currentLang]['Scan complete'] || 'Scan complete';
+            scanStatus.classList.remove('scanning');
+            scanStatus.classList.add('complete');
+
             if (total !== 'Not Found') {
                 currentInput = total;
                 display.textContent = currentInput;
                 const totalMessages = {
-                    'en-IN': `The bill total is ${total}`,
-                    'hi-IN': `बिल का कुल योग है ${total}`,
-                    'bn-IN': `বিলের মোট হল ${total}`
+                    'en-IN': `Scan complete, the bill total is ${total}`,
+                    'hi-IN': `स्कैन पूरा हुआ, बिल का कुल योग है ${total}`,
+                    'bn-IN': `স্ক্যান সম্পূর্ণ, বিলের মোট হল ${total}`
                 };
                 speak(totalMessages[currentLang]);
             } else {
                 speak('Error scanning bill');
+                scanStatus.textContent = translations[currentLang]['Error scanning bill'] || 'Error scanning bill';
             }
+
+            await worker.terminate();
         } catch (error) {
             console.error('Scan error:', error);
             billResult.textContent = 'Error scanning bill';
+            scanStatus.textContent = translations[currentLang]['Error scanning bill'] || 'Error scanning bill';
+            scanStatus.classList.remove('scanning');
             speak('Error scanning bill');
         }
     };

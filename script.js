@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         intro.classList.add('hidden');
         calculatorContainer.style.display = 'block';
-    }, 3000); // 3 seconds intro
+    }, 3000);
 });
 
 // Calculator Logic
@@ -45,7 +45,8 @@ buttons.forEach(button => {
 // Theme Cycling
 themeCycle.addEventListener('click', () => {
     themeIndex = (themeIndex + 1) % themes.length;
-    document.body.className = themes[themeIndex];
+    document.body.className = themes[themeIndex]; // Ensure theme applies
+    console.log('Theme switched to:', themes[themeIndex]); // Debug log
     speak(`Theme changed to ${themes[themeIndex]}`);
 });
 
@@ -155,6 +156,7 @@ if (recognition) {
         else if (command.includes('change theme') || command.includes('theme badlo')) {
             themeIndex = (themeIndex + 1) % themes.length;
             document.body.className = themes[themeIndex];
+            console.log('Theme switched to:', themes[themeIndex]);
             speak(`Theme changed to ${themes[themeIndex]}`);
         }
 
@@ -331,7 +333,7 @@ function speakResult(result) {
     speak(messages[currentLang]);
 }
 
-// Smart Bill Scanner (Fixed Scanning)
+// Smart Bill Scanner
 const billInput = document.getElementById('billInput');
 const billResult = document.getElementById('billResult');
 const scanStatus = document.getElementById('scanStatus');
@@ -340,7 +342,6 @@ billInput.addEventListener('change', async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Scanning Feedback
     scanStatus.textContent = translations[currentLang]['Scanning bill'] || 'Scanning bill';
     scanStatus.classList.add('scanning');
     speak('Scanning bill');
@@ -350,7 +351,6 @@ billInput.addEventListener('change', async (event) => {
 
     img.onload = async () => {
         try {
-            // Optimize image for better OCR
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = img.width;
@@ -378,7 +378,6 @@ billInput.addEventListener('change', async (event) => {
             const total = totalMatch ? totalMatch[1] : 'Not Found';
             billResult.textContent = `Total: ${total}`;
 
-            // Scan Complete Feedback
             scanStatus.textContent = translations[currentLang]['Scan complete'] || 'Scan complete';
             scanStatus.classList.remove('scanning');
             scanStatus.classList.add('complete');

@@ -7,10 +7,18 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="calculator-container">
+    <!-- Intro Section -->
+    <div class="intro" id="intro">
+        <h1 class="intro-title">Ultimate AI Calculator</h1>
+        <p class="intro-tagline">Calculate Smarter with AI</p>
+        <div class="intro-loader"></div> <!-- Animated loader -->
+    </div>
+
+    <!-- Calculator Container -->
+    <div class="calculator-container" id="calculatorContainer" style="display: none;">
         <div class="header">
             <button id="voiceToggle" class="voice-btn">
-                <span class="mic-icon"></span> <!-- Empty span, icon CSS se ayega -->
+                <span class="mic-icon"></span>
             </button>
             <div class="display" id="display">0</div>
         </div>

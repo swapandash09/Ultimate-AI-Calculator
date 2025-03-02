@@ -10,7 +10,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(45deg, #1e90ff, #ff1493); /* Default background */
+    background: linear-gradient(45deg, #1e90ff, #ff1493);
     transition: background 0.5s ease;
     padding: 0;
     margin: 0;
@@ -79,51 +79,32 @@ body {
 }
 
 .calculator-container {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.2); /* Theme-driven UI */
     backdrop-filter: blur(15px);
     padding: 15px;
     border-radius: 35px;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35), inset 0 0 20px rgba(255, 255, 255, 0.1);
     width: 100%;
     max-width: 100%;
     height: 100vh;
-    border: 4px solid transparent;
-    background-clip: padding-box;
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     animation: slideUp 0.5s ease forwards;
-}
-.calculator-container::before {
-    content: '';
-    position: absolute;
-    top: -4px;
-    left: -4px;
-    right: -4px;
-    bottom: -4px;
-    background: linear-gradient(45deg, rgba(0, 255, 204, 0.5), rgba(255, 105, 180, 0.5), rgba(0, 184, 255, 0.5)); /* Subtle glow */
-    z-index: -1;
-    border-radius: 35px;
-    animation: borderGlow 5s ease infinite; /* Slower animation */
-}
-@keyframes borderGlow {
-    0% { opacity: 0.7; }
-    50% { opacity: 1; }
-    100% { opacity: 0.7; }
+    transition: background 0.5s ease; /* Smooth theme transition */
 }
 @keyframes slideUp {
     0% { opacity: 0; transform: translateY(50px); }
     100% { opacity: 1; transform: translateY(0); }
 }
 
-/* Theme Fixes */
+/* Theme-Specific Styles */
 body.dark {
     background: linear-gradient(45deg, #0f0c29, #302b63);
 }
 body.dark .calculator-container {
-    background: rgba(30, 30, 30, 0.95); /* Darker base */
+    background: rgba(30, 30, 30, 0.95);
     color: #fff;
 }
 body.dark .display,
@@ -133,7 +114,7 @@ body.dark .footer,
 body.dark .bill-scanner label,
 body.dark #billResult,
 body.dark .scan-status {
-    color: #fff; /* Ensure visibility */
+    color: #fff;
 }
 body.dark .display {
     background: rgba(255, 255, 255, 0.1);
@@ -143,7 +124,7 @@ body.colorful {
 }
 body.colorful .calculator-container {
     background: rgba(255, 255, 255, 0.25);
-    color: #333; /* Darker text for contrast */
+    color: #333;
 }
 body.colorful .display,
 body.colorful .control-btn,
@@ -152,13 +133,13 @@ body.colorful .footer,
 body.colorful .bill-scanner label,
 body.colorful #billResult,
 body.colorful .scan-status {
-    color: #333; /* Visible in colorful */
+    color: #333;
 }
 body.colorful .display {
     background: rgba(255, 255, 255, 0.2);
 }
 body.light {
-    background: linear-gradient(45deg, #f0f0f0, #ffffff); /* Light gradient */
+    background: linear-gradient(45deg, #f0f0f0, #ffffff);
 }
 body.light .calculator-container {
     background: rgba(255, 255, 255, 0.8);
@@ -171,7 +152,7 @@ body.light .footer,
 body.light .bill-scanner label,
 body.light #billResult,
 body.light .scan-status {
-    color: #333; /* Dark text for light theme */
+    color: #333;
 }
 body.light .display {
     background: rgba(200, 200, 200, 0.2);
@@ -255,8 +236,9 @@ button:active {
 .clear { background: linear-gradient(135deg, #ffa502, #ff6b6b); }
 .equals { background: linear-gradient(135deg, #45b7d1, #4ecdc4); }
 
+/* New Mic Icon */
 .voice-btn {
-    background: linear-gradient(135deg, #00ffcc, #00b8ff);
+    background: linear-gradient(135deg, #ffd700, #ff4500); /* Gold to orange gradient */
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -268,31 +250,43 @@ button:active {
     left: 10px;
     cursor: pointer;
     transition: all 0.4s ease;
-    box-shadow: 0 5px 20px rgba(0, 255, 204, 0.6);
-    border: 2px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.6);
+    overflow: hidden;
+}
+.voice-btn::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.voice-btn:hover::before {
+    opacity: 1; /* Subtle shine on hover */
 }
 .voice-btn:hover {
     transform: scale(1.15);
-    background: linear-gradient(135deg, #00ffcc, #00eaff);
+    background: linear-gradient(135deg, #ffeb3b, #ff6347);
 }
 .voice-btn.active {
-    background: linear-gradient(135deg, #ff69b4, #00ffcc);
+    background: linear-gradient(135deg, #00ced1, #ff00ff); /* Cyan to magenta */
     animation: micPulse 1.5s infinite;
 }
 @keyframes micPulse {
-    0% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.8); }
-    70% { box-shadow: 0 0 0 20px rgba(255, 105, 180, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0); }
+    0% { box-shadow: 0 0 0 0 rgba(0, 206, 209, 0.8); }
+    70% { box-shadow: 0 0 0 15px rgba(0, 206, 209, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 206, 209, 0); }
 }
 .mic-icon {
-    width: 20px;
-    height: 20px;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 14c1.66 0 3-1.31 3-2.97v-7.02c0-1.66-1.34-3-3-3s-3 1.34-3 3v7.02c0 1.66 1.34 2.97 3 2.97zM6.5 11.5v2h-2v-2h2zm13 0v2h-2v-2h2zm-7-10.5c2.21 0 4 1.79 4 4v7c0 2.21-1.79 4-4 4s-4-1.79-4-4v-7c0-2.21 1.79-4 4-4zm0 14c1.38 0 2.5-1.12 2.5-2.5v-7c0-1.38-1.12-2.5-2.5-2.5s-2.5 1.12-2.5 2.5v7c0 1.38 1.12 2.5 2.5 2.5zm-5 2v2h10v-2h-10z"/></svg>') no-repeat center;
+    width: 24px;
+    height: 24px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 15c2.21 0 4-1.79 4-4V5c0-2.21-1.79-4-4-4S8 2.79 8 5v6c0 2.21 1.79 4 4 4zm0-2c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2s2 .9 2 2v6c0 1.1-.9 2-2 2zm-6 2v2h12v-2H6zm6 4c-3.31 0-6-2.69-6-6h-2c0 4.41 3.59 8 8 8s8-3.59 8-8h-2c0 3.31-2.69 6-6 6z"/></svg>') no-repeat center;
     background-size: contain;
     transition: transform 0.4s ease;
 }
 .voice-btn.active .mic-icon {
-    transform: scale(1.2) rotate(45deg);
+    transform: scale(1.2) rotate(360deg); /* Full spin */
 }
 
 .bill-scanner {

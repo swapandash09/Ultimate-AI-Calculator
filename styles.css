@@ -12,7 +12,7 @@ body {
     min-height: 100vh;
     background: linear-gradient(45deg, #1e90ff, #ff1493);
     transition: background 0.5s ease;
-    padding: 0; /* Removed padding for full edge fit */
+    padding: 0;
     margin: 0;
     overflow: hidden;
 }
@@ -81,18 +81,37 @@ body {
 .calculator-container {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(15px);
-    padding: 10px; /* Reduced padding for full fit */
-    border-radius: 0; /* Removed border-radius for edge-to-edge */
-    box-shadow: none; /* Simplified for mobile app feel */
-    width: 100vw; /* Full viewport width */
-    height: 100vh; /* Full viewport height */
-    border: none;
+    padding: 15px;
+    border-radius: 35px; /* Round design wapas */
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35), inset 0 0 20px rgba(255, 255, 255, 0.1);
+    width: 100%; /* Full width */
+    max-width: 100%; /* No restriction */
+    height: 100vh;
+    border: 4px solid transparent; /* Unique border effect */
+    background-clip: padding-box; /* Border ke andar background */
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     animation: slideUp 0.5s ease forwards;
+}
+.calculator-container::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    background: linear-gradient(45deg, #00ffcc, #ff69b4, #00b8ff); /* Gradient border */
+    z-index: -1;
+    border-radius: 35px;
+    animation: borderGlow 3s ease infinite;
+}
+@keyframes borderGlow {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.5); }
+    100% { filter: brightness(1); }
 }
 @keyframes slideUp {
     0% { opacity: 0; transform: translateY(50px); }
@@ -108,9 +127,34 @@ body.dark .calculator-container {
 }
 body.dark .display {
     background: rgba(255, 255, 255, 0.15);
+    color: #fff; /* Visible in dark */
+}
+body.dark .control-btn,
+body.dark .button,
+body.dark .footer,
+body.dark .bill-scanner label,
+body.dark #billResult,
+body.dark .scan-status {
+    color: #fff; /* Ensure visibility */
 }
 body.colorful {
     background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+}
+body.light .calculator-container {
+    background: rgba(255, 255, 255, 0.2);
+    color: #333; /* Darker text for light theme */
+}
+body.light .display {
+    background: rgba(255, 255, 255, 0.25);
+    color: #333;
+}
+body.light .control-btn,
+body.light .button,
+body.light .footer,
+body.light .bill-scanner label,
+body.light #billResult,
+body.light .scan-status {
+    color: #333; /* Visible in light */
 }
 
 .header {
@@ -124,12 +168,15 @@ body.colorful {
 .display {
     background: none;
     padding: 15px;
-    text-align: right;
+    text-align: center; /* Centered for mobile */
     font-size: 2.5em;
     color: #fff;
     overflow-x: auto;
-    width: 100%;
-    flex-grow: 1; /* Takes available space */
+    width: 80%; /* Centered width */
+    margin: 0 auto; /* Middle mein */
+    border-radius: 15px; /* Round design */
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .controls {
@@ -145,7 +192,7 @@ body.colorful {
     border: none;
     border-radius: 25px;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
-    color: #fff;
+    color: inherit; /* Theme-based color */
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 1em;
@@ -162,14 +209,14 @@ body.colorful {
 .buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 5px; /* Tightened gap */
+    gap: 5px;
     padding: 10px;
-    flex-grow: 2; /* Takes remaining space */
+    flex-grow: 2;
 }
 
 button {
     padding: 15px;
-    font-size: 1.5em; /* Slightly larger for mobile */
+    font-size: 1.5em;
     border: none;
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.3);
@@ -193,7 +240,7 @@ button:active {
 .voice-btn {
     background: linear-gradient(135deg, #00ffcc, #00b8ff);
     border-radius: 50%;
-    width: 40px; /* Adjusted for mobile */
+    width: 40px;
     height: 40px;
     display: flex;
     align-items: center;
@@ -236,11 +283,11 @@ button:active {
     color: #fff;
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Reduced gap */
+    gap: 5px;
     background: rgba(255, 255, 255, 0.05);
 }
 .bill-scanner label { 
-    font-size: 1em; /* Adjusted for mobile */
+    font-size: 1em; 
     text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 #billInput { 
@@ -280,7 +327,7 @@ button:active {
 .footer {
     text-align: center;
     padding: 5px;
-    color: rgba(255, 255, 255, 0.9);
+    color: #fff;
     font-size: 0.8em;
     text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     background: rgba(255, 255, 255, 0.05);
@@ -310,7 +357,8 @@ button:active {
         font-size: 1em;
     }
     .display {
-        font-size: 1.8em; /* Adjusted for smaller screens */
+        font-size: 1.8em;
+        width: 90%;
     }
     button {
         font-size: 1.2em;

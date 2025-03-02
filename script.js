@@ -3,12 +3,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const intro = document.getElementById('intro');
     const calculatorContainer = document.getElementById('calculatorContainer');
 
+    if (!intro || !calculatorContainer) {
+        console.error('Intro or Calculator container not found in DOM');
+        return;
+    }
+
     console.log('Page loaded, intro visible');
-    calculatorContainer.style.display = 'none'; // Initially hide calculator
+    calculatorContainer.style.display = 'none'; // Ensure calculator is hidden initially
     setTimeout(() => {
         console.log('Hiding intro, showing calculator');
         intro.classList.add('hidden');
         calculatorContainer.style.display = 'block';
+        setTimeout(() => {
+            calculatorContainer.classList.add('visible'); // Fade in calculator
+            console.log('Calculator now visible');
+        }, 10); // Small delay for smooth transition
     }, 3000);
 });
 
@@ -19,60 +28,70 @@ let currentInput = '0';
 let currentLang = 'en-IN';
 let calculationHistory = [];
 
+if (!display || !buttons.length) {
+    console.error('Display or buttons not found in DOM');
+} else {
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            const value = button.textContent;
+            console.log('Button clicked:', value);
+            if (value === 'C') {
+                currentInput = '0';
+                speak('Cleared');
+            } else if (value === '=') {
+                try {
+                    const result = eval(currentInput).toString();
+                    speakResult(result);
+                    calculationHistory.push({
+                        date: new Date().toLocaleString(),
+                        input: currentInput,
+                        result: result
+                    });
+                    currentInput = result;
+                } catch {
+                    currentInput = 'Error';
+                    speak('Error in calculation');
+                }
+            } else {
+                currentInput = currentInput === '0' ? value : currentInput + value;
+                speak(value);
+            }
+            display.textContent = currentInput;
+        });
+    });
+}
+
 // Theme Initialization
 const themeCycle = document.getElementById('theme-cycle');
 const themes = ['light', 'dark', 'colorful'];
 let themeIndex = 0;
 
-buttons.forEach(button => {
-    button.addEventListener('click', () => {
-        const value = button.textContent;
-        if (value === 'C') {
-            currentInput = '0';
-            speak('Cleared');
-        } else if (value === '=') {
-            try {
-                const result = eval(currentInput).toString();
-                speakResult(result);
-                calculationHistory.push({
-                    date: new Date().toLocaleString(),
-                    input: currentInput,
-                    result: result
-                });
-                currentInput = result;
-            } catch {
-                currentInput = 'Error';
-                speak('Error in calculation');
-            }
-        } else {
-            currentInput = currentInput === '0' ? value : currentInput + value;
-            speak(value);
-        }
-        display.textContent = currentInput;
+if (themeCycle) {
+    themeCycle.addEventListener('click', () => {
+        themeIndex = (themeIndex + 1) % themes.length;
+        applyTheme(themes[themeIndex]);
+        speak(`Theme changed to ${themes[themeIndex]}`);
     });
-});
-
-// Theme Cycling
-themeCycle.addEventListener('click', () => {
-    themeIndex = (themeIndex + 1) % themes.length;
-    applyTheme(themes[themeIndex]);
-    speak(`Theme changed to ${themes[themeIndex]}`);
-});
+}
 
 // Apply Theme Function
 function applyTheme(theme) {
     document.body.className = theme;
     console.log('Theme switched to:', theme);
     const container = document.querySelector('.calculator-container');
-    if (theme === 'dark') {
-        container.style.background = 'rgba(40, 40, 40, 0.95)';
-        container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.5)';
-    } else if (theme === 'colorful') {
-        container.style.background = 'rgba(255, 255, 255, 0.2)';
-        container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3)';
-    } else if (theme === 'light') {
-        container.style.background = 'rgba(240, 240, 240, 0.95)';
-        container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.2)';
+    if (container) {
+        if (theme === 'dark') {
+            container.style.background = 'rgba(40, 40, 40, 0.95)';
+            container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.5)';
+        } else if (theme === 'colorful') {
+            container.style.background = 'rgba(255, 255, 255, 0.2)';
+            container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3)';
+        } else if (theme === 'light') {
+            container.style.background = 'rgba(240, 240, 240, 0.95)';
+            container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.2)';
+        }
+    } else {
+        console.error('Calculator container not found for theme apply');
     }
 }
 
@@ -85,38 +104,47 @@ const languages = [
 ];
 let langIndex = 0;
 
-langCycle.addEventListener('click', () => {
-    langIndex = (langIndex + 1) % languages.length;
-    currentLang = languages[langIndex].code;
-    if (recognition) recognition.lang = currentLang;
-    speak(`Language changed to ${languages[langIndex].name}`);
-});
+if (langCycle) {
+    langCycle.addEventListener('click', () => {
+        langIndex = (langIndex + 1) % languages.length;
+        currentLang = languages[langIndex].code;
+        if (recognition) recognition.lang = currentLang;
+        speak(`Language changed to ${languages[langIndex].name}`);
+    });
+}
 
 // History Toggle
 const historyToggle = document.getElementById('historyToggle');
 const historyPanel = document.getElementById('historyPanel');
-historyToggle.addEventListener('click', () => {
-    historyPanel.style.display = historyPanel.style.display === 'none' ? 'block' : 'none';
-    updateHistoryUI();
-});
+
+if (historyToggle && historyPanel) {
+    historyToggle.addEventListener('click', () => {
+        historyPanel.style.display = historyPanel.style.display === 'none' ? 'block' : 'none';
+        updateHistoryUI();
+    });
+}
 
 // Update History UI
 function updateHistoryUI() {
     const historyList = document.getElementById('historyList');
     const historyInsights = document.getElementById('historyInsights');
-    historyList.innerHTML = '';
-    calculationHistory.forEach(entry => {
-        const li = document.createElement('li');
-        li.textContent = `${entry.date}: ${entry.input} = ${entry.result}`;
-        historyList.appendChild(li);
-    });
+    if (historyList && historyInsights) {
+        historyList.innerHTML = '';
+        calculationHistory.forEach(entry => {
+            const li = document.createElement('li');
+            li.textContent = `${entry.date}: ${entry.input} = ${entry.result}`;
+            historyList.appendChild(li);
+        });
 
-    const totals = calculationHistory.filter(h => !isNaN(parseFloat(h.result))).map(h => parseFloat(h.result));
-    if (totals.length > 0) {
-        const avg = totals.reduce((a, b) => a + b, 0) / totals.length;
-        historyInsights.textContent = `Average Result: ${avg.toFixed(2)}`;
+        const totals = calculationHistory.filter(h => !isNaN(parseFloat(h.result))).map(h => parseFloat(h.result));
+        if (totals.length > 0) {
+            const avg = totals.reduce((a, b) => a + b, 0) / totals.length;
+            historyInsights.textContent = `Average Result: ${avg.toFixed(2)}`;
+        } else {
+            historyInsights.textContent = 'No numeric results yet.';
+        }
     } else {
-        historyInsights.textContent = 'No numeric results yet.';
+        console.error('History list or insights element not found');
     }
 }
 
@@ -430,42 +458,88 @@ const billInput = document.getElementById('billInput');
 const billResult = document.getElementById('billResult');
 const scanStatus = document.getElementById('scanStatus');
 
-billInput.addEventListener('change', async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+if (billInput && billResult && scanStatus) {
+    billInput.addEventListener('change', async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
 
-    scanStatus.textContent = translations[currentLang]['Scanning bill'] || 'Scanning bill';
-    scanStatus.classList.add('scanning');
-    speak('Scanning bill');
+        scanStatus.textContent = translations[currentLang]['Scanning bill'] || 'Scanning bill';
+        scanStatus.classList.add('scanning');
+        speak('Scanning bill');
 
-    const img = new Image();
-    img.src = URL.createObjectURL(file);
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
 
-    img.onload = async () => {
-        try {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            ctx.filter = 'contrast(1.5) grayscale(1)';
-            const enhancedImg = canvas.toDataURL('image/jpeg');
+        img.onload = async () => {
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                ctx.filter = 'contrast(1.5) grayscale(1)';
+                const enhancedImg = canvas.toDataURL('image/jpeg');
 
-            const worker = await Tesseract.createWorker('eng', Tesseract.OEM.LSTM_ONLY, {
-                workerPath: 'https://unpkg.com/tesseract.js@v5.0.4/dist/worker.min.js',
-                langPath: 'https://tessdata.projectnaptha.com/4.0.0_best',
-                corePath: 'https://unpkg.com/tesseract.js-core@v5.0.0/tesseract-core.wasm.js',
-            });
-            await worker.setParameters({
-                tessedit_char_whitelist: '0123456789₹$.TotalAMOUNT',
-                tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
-                user_defined_dpi: '70'
-            });
+                const worker = await Tesseract.createWorker('eng', Tesseract.OEM.LSTM_ONLY, {
+                    workerPath: 'https://unpkg.com/tesseract.js@v5.0.4/dist/worker.min.js',
+                    langPath: 'https://tessdata.projectnaptha.com/4.0.0_best',
+                    corePath: 'https://unpkg.com/tesseract.js-core@v5.0.0/tesseract-core.wasm.js',
+                });
+                await worker.setParameters({
+                    tessedit_char_whitelist: '0123456789₹$.TotalAMOUNT',
+                    tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
+                    user_defined_dpi: '70'
+                });
 
-            const { data: { text } } = await worker.recognize(enhancedImg);
-            console.log('Bill text:', text);
+                const { data: { text } } = await worker.recognize(enhancedImg);
+                console.log('Bill text:', text);
 
-            const totalMatch = text.match(/(?:Total|TOTAL|Amount|AMOUNT|Sum|SUM)[:\s]*[₹$]?(\d+(?:\.\d{1,2})?)/i) ||
-                              text.match(/(\d+(?:\.\d{1,2})?)(?:\s*$|\s+[^\d])/i);
-            const total = totalMatch ? totalMatch[1] : 'Not Found';
-            bill
+                const totalMatch = text.match(/(?:Total|TOTAL|Amount|AMOUNT|Sum|SUM)[:\s]*[₹$]?(\d+(?:\.\d{1,2})?)/i) ||
+                                  text.match(/(\d+(?:\.\d{1,2})?)(?:\s*$|\s+[^\d])/i);
+                const total = totalMatch ? totalMatch[1] : 'Not Found';
+                billResult.textContent = `Total: ${total}`;
+
+                scanStatus.textContent = translations[currentLang]['Scan complete'] || 'Scan complete';
+                scanStatus.classList.remove('scanning');
+                scanStatus.classList.add('complete');
+
+                if (total !== 'Not Found') {
+                    currentInput = total;
+                    display.textContent = currentInput;
+                    const totalMessages = {
+                        'en-IN': `Scan complete, the bill total is ${total}`,
+                        'hi-IN': `स्कैन पूरा हुआ, बिल का कुल योग है ${total}`,
+                        'bn-IN': `স্ক্যান সম্পূর্ণ, বিলের মোট হল ${total}`
+                    };
+                    speak(totalMessages[currentLang]);
+                    calculationHistory.push({
+                        date: new Date().toLocaleString(),
+                        input: 'Bill Scan',
+                        result: total
+                    });
+                } else {
+                    speak('Error scanning bill');
+                    scanStatus.textContent = translations[currentLang]['Error scanning bill'] || 'Error scanning bill';
+                }
+
+                await worker.terminate();
+            } catch (error) {
+                console.error('Detailed scan error:', error.message, error.stack);
+                billResult.textContent = 'Error scanning bill';
+                scanStatus.textContent = translations[currentLang]['Error scanning bill'] || 'Error scanning bill';
+                scanStatus.classList.remove('scanning');
+                speak('Error scanning bill');
+                console.log('Check image quality or network connection.');
+            }
+        };
+        img.onerror = () => {
+            console.error('Image load error');
+            billResult.textContent = 'Error loading image';
+            scanStatus.textContent = translations[currentLang]['Error scanning bill'] || 'Error scanning bill';
+            scanStatus.classList.remove('scanning');
+            speak('Error scanning bill');
+        };
+    });
+} else {
+    console.error('Bill scanner elements not found');
+}

@@ -3,7 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const intro = document.getElementById('intro');
     const calculatorContainer = document.getElementById('calculatorContainer');
 
+    console.log('Page loaded, intro visible');
+    calculatorContainer.style.display = 'none'; // Initially hide calculator
     setTimeout(() => {
+        console.log('Hiding intro, showing calculator');
         intro.classList.add('hidden');
         calculatorContainer.style.display = 'block';
     }, 3000);
@@ -52,10 +55,26 @@ buttons.forEach(button => {
 // Theme Cycling
 themeCycle.addEventListener('click', () => {
     themeIndex = (themeIndex + 1) % themes.length;
-    document.body.className = themes[themeIndex];
-    console.log('Theme switched to:', themes[themeIndex]);
+    applyTheme(themes[themeIndex]);
     speak(`Theme changed to ${themes[themeIndex]}`);
 });
+
+// Apply Theme Function
+function applyTheme(theme) {
+    document.body.className = theme;
+    console.log('Theme switched to:', theme);
+    const container = document.querySelector('.calculator-container');
+    if (theme === 'dark') {
+        container.style.background = 'rgba(40, 40, 40, 0.95)';
+        container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.5)';
+    } else if (theme === 'colorful') {
+        container.style.background = 'rgba(255, 255, 255, 0.2)';
+        container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3)';
+    } else if (theme === 'light') {
+        container.style.background = 'rgba(240, 240, 240, 0.95)';
+        container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.2)';
+    }
+}
 
 // Language Cycling
 const langCycle = document.getElementById('lang-cycle');
@@ -92,7 +111,6 @@ function updateHistoryUI() {
         historyList.appendChild(li);
     });
 
-    // Simple Insight Example
     const totals = calculationHistory.filter(h => !isNaN(parseFloat(h.result))).map(h => parseFloat(h.result));
     if (totals.length > 0) {
         const avg = totals.reduce((a, b) => a + b, 0) / totals.length;
@@ -188,12 +206,20 @@ if (recognition) {
             speak('ভাষা বাংলায় পরিবর্তন হয়েছে');
         }
 
-        // Theme Switching
+        // Theme Switching with UI/UX Change
         else if (command.includes('change theme') || command.includes('theme badlo')) {
             themeIndex = (themeIndex + 1) % themes.length;
-            document.body.className = themes[themeIndex];
-            console.log('Theme switched to:', themes[themeIndex]);
+            applyTheme(themes[themeIndex]);
             speak(`Theme changed to ${themes[themeIndex]}`);
+        } else if (command.includes('light theme') || command.includes('light mode')) {
+            applyTheme('light');
+            speak('Theme changed to light');
+        } else if (command.includes('dark theme') || command.includes('dark mode')) {
+            applyTheme('dark');
+            speak('Theme changed to dark');
+        } else if (command.includes('colorful theme') || command.includes('colorful mode')) {
+            applyTheme('colorful');
+            speak('Theme changed to colorful');
         }
 
         // Current Time (Abhi to bole)
@@ -442,32 +468,4 @@ billInput.addEventListener('change', async (event) => {
             const totalMatch = text.match(/(?:Total|TOTAL|Amount|AMOUNT|Sum|SUM)[:\s]*[₹$]?(\d+(?:\.\d{1,2})?)/i) ||
                               text.match(/(\d+(?:\.\d{1,2})?)(?:\s*$|\s+[^\d])/i);
             const total = totalMatch ? totalMatch[1] : 'Not Found';
-            billResult.textContent = `Total: ${total}`;
-
-            scanStatus.textContent = translations[currentLang]['Scan complete'] || 'Scan complete';
-            scanStatus.classList.remove('scanning');
-            scanStatus.classList.add('complete');
-
-            if (total !== 'Not Found') {
-                currentInput = total;
-                display.textContent = currentInput;
-                const totalMessages = {
-                    'en-IN': `Scan complete, the bill total is ${total}`,
-                    'hi-IN': `स्कैन पूरा हुआ, बिल का कुल योग है ${total}`,
-                    'bn-IN': `স্ক্যান সম্পূর্ণ, বিলের মোট হল ${total}`
-                };
-                speak(totalMessages[currentLang]);
-                calculationHistory.push({
-                    date: new Date().toLocaleString(),
-                    input: 'Bill Scan',
-                    result: total
-                });
-            } else {
-                speak('Error scanning bill');
-                scanStatus.textContent = translations[currentLang]['Error scanning bill'] || 'Error scanning bill';
-            }
-
-            await worker.terminate();
-        } catch (error) {
-            console.error('Detailed scan error:', error.message, error.stack);
-      
+            bill

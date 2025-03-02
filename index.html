@@ -8,14 +8,15 @@
 </head>
 <body>
     <div class="calculator-container">
-        <div class="display" id="display">0</div>
-        <div class="controls">
-            <button id="theme-cycle">Theme</button>
-            <button id="lang-cycle">Language</button>
+        <div class="header">
+            <button id="voiceToggle" class="voice-btn">
+                <span class="mic-icon">🎙️</span>
+            </button>
+            <div class="display" id="display">0</div>
         </div>
-        <div class="voice-btn" id="voiceToggle">
-            <span class="mic-icon"></span>
-            <span class="wave-effect"></span>
+        <div class="controls">
+            <button id="theme-cycle" class="control-btn">Theme</button>
+            <button id="lang-cycle" class="control-btn">Language</button>
         </div>
         <div class="bill-scanner">
             <label for="billInput">Scan Bill:</label>
@@ -42,7 +43,6 @@
         </div>
         <div class="footer">Powered by SD</div>
     </div>
-
     <script src="https://unpkg.com/tesseract.js@v5.0.4/dist/tesseract.min.js"></script>
     <script src="script.js"></script>
 </body>

@@ -60,7 +60,7 @@ let recognition;
 
 try {
     recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.continuous = true; // Mic hamesha active
+    recognition.continuous = false; // Changed to false for manual restart control
     recognition.interimResults = false;
     recognition.lang = currentLang;
 } catch (error) {
@@ -96,7 +96,24 @@ function startRecognition() {
         speak('Mic failed to start, check permissions');
         voiceToggle.classList.remove('active');
         isVoiceActive = false;
+        checkMicPermission(); // Check permission status
     }
+}
+
+// Permission Check Function
+function checkMicPermission() {
+    navigator.permissions.query({ name: 'microphone' }).then((result) => {
+        if (result.state === 'denied') {
+            speak('Mic permission denied. Please allow it in browser settings.');
+            console.log('Permission denied. Go to Chrome Settings > Privacy and Security > Microphone.');
+        } else if (result.state === 'prompt') {
+            console.log('Permission not yet granted. Click mic again to request.');
+        } else if (result.state === 'granted') {
+            console.log('Permission granted, but mic still failed. Check device.');
+        }
+    }).catch((error) => {
+        console.error('Permission query error:', error);
+    });
 }
 
 // Voice Recognition Handling
@@ -137,13 +154,15 @@ if (recognition) {
             let operator = match[2];
             let num2 = match[3];
 
-            currentInput = `${num1}${operator}${num2}`; // Removed spaces for eval
+            currentInput = `${num1}${operator}${num2}`;
             display.textContent = currentInput;
+            console.log('Expression:', currentInput);
 
             try {
                 currentInput = eval(currentInput).toString();
                 speakResult(currentInput);
                 display.textContent = currentInput;
+                console.log('Result:', currentInput);
             } catch {
                 currentInput = 'Error';
                 speak('Error in calculation');
@@ -160,9 +179,9 @@ if (recognition) {
             speak('Please repeat the command clearly');
         }
 
-        // Auto Restart Recognition for Continuous Mode
+        // Manual Restart for Better Control
         recognition.stop();
-        if (isVoiceActive) setTimeout(startRecognition, 1000);
+        if (isVoiceActive) setTimeout(startRecognition, 1500);
     };
 
     recognition.onerror = (event) => {
@@ -174,11 +193,14 @@ if (recognition) {
         speak(errorMessage);
         voiceToggle.classList.remove('active');
         isVoiceActive = false;
+        checkMicPermission(); // Check permission on error
     };
 
     recognition.onend = () => {
         console.log('Voice recognition stopped');
-        if (isVoiceActive) setTimeout(startRecognition, 1000);
+        if (isVoiceActive) {
+            setTimeout(startRecognition, 1500); // Consistent restart delay
+        }
     };
 }
 
@@ -276,4 +298,4 @@ function speakResult(result) {
         'bn-IN': `ফলাফল হল ${result}`
     };
     speak(messages[currentLang]);
-                }
+        }

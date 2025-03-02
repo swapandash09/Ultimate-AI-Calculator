@@ -10,7 +10,7 @@
     <div class="calculator-container">
         <div class="header">
             <button id="voiceToggle" class="voice-btn">
-                <span class="mic-icon">🎙️</span>
+                <span class="mic-icon"></span> <!-- Empty span, icon CSS se ayega -->
             </button>
             <div class="display" id="display">0</div>
         </div>
@@ -20,8 +20,9 @@
         </div>
         <div class="bill-scanner">
             <label for="billInput">Scan Bill:</label>
-            <input type="file" id="billInput" accept="image/*">
+            <input type="file" id="billInput" accept="image/*" capture="environment">
             <div id="billResult">Total: N/A</div>
+            <div id="scanStatus" class="scan-status">Ready</div>
         </div>
         <div class="buttons">
             <button class="number">7</button>

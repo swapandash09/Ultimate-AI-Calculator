@@ -1,3 +1,14 @@
+// Intro Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const intro = document.getElementById('intro');
+    const calculatorContainer = document.getElementById('calculatorContainer');
+
+    setTimeout(() => {
+        intro.classList.add('hidden');
+        calculatorContainer.style.display = 'block';
+    }, 3000); // 3 seconds intro
+});
+
 // Calculator Logic
 const display = document.getElementById('display');
 const buttons = document.querySelectorAll('.buttons button');
@@ -345,7 +356,7 @@ billInput.addEventListener('change', async (event) => {
             canvas.width = img.width;
             canvas.height = img.height;
             ctx.drawImage(img, 0, 0);
-            ctx.filter = 'contrast(1.5) grayscale(1)'; // Enhance contrast and grayscale
+            ctx.filter = 'contrast(1.5) grayscale(1)';
             const enhancedImg = canvas.toDataURL('image/jpeg');
 
             const worker = await Tesseract.createWorker('eng', Tesseract.OEM.LSTM_ONLY, {
@@ -356,15 +367,14 @@ billInput.addEventListener('change', async (event) => {
             await worker.setParameters({
                 tessedit_char_whitelist: '0123456789₹$.TotalAMOUNT',
                 tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
-                user_defined_dpi: '70' // Improve recognition for low-res images
+                user_defined_dpi: '70'
             });
 
             const { data: { text } } = await worker.recognize(enhancedImg);
             console.log('Bill text:', text);
 
-            // More robust total detection
             const totalMatch = text.match(/(?:Total|TOTAL|Amount|AMOUNT|Sum|SUM)[:\s]*[₹$]?(\d+(?:\.\d{1,2})?)/i) ||
-                              text.match(/(\d+(?:\.\d{1,2})?)(?:\s*$|\s+[^\d])/i); // Fallback to last standalone number
+                              text.match(/(\d+(?:\.\d{1,2})?)(?:\s*$|\s+[^\d])/i);
             const total = totalMatch ? totalMatch[1] : 'Not Found';
             billResult.textContent = `Total: ${total}`;
 

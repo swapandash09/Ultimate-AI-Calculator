@@ -14,6 +14,7 @@ const display = document.getElementById('display');
 const buttons = document.querySelectorAll('.buttons button');
 let currentInput = '0';
 let currentLang = 'en-IN';
+let calculationHistory = [];
 
 // Theme Initialization
 const themeCycle = document.getElementById('theme-cycle');
@@ -28,8 +29,14 @@ buttons.forEach(button => {
             speak('Cleared');
         } else if (value === '=') {
             try {
-                currentInput = eval(currentInput).toString();
-                speakResult(currentInput);
+                const result = eval(currentInput).toString();
+                speakResult(result);
+                calculationHistory.push({
+                    date: new Date().toLocaleString(),
+                    input: currentInput,
+                    result: result
+                });
+                currentInput = result;
             } catch {
                 currentInput = 'Error';
                 speak('Error in calculation');
@@ -45,8 +52,8 @@ buttons.forEach(button => {
 // Theme Cycling
 themeCycle.addEventListener('click', () => {
     themeIndex = (themeIndex + 1) % themes.length;
-    document.body.className = themes[themeIndex]; // Ensure theme applies
-    console.log('Theme switched to:', themes[themeIndex]); // Debug log
+    document.body.className = themes[themeIndex];
+    console.log('Theme switched to:', themes[themeIndex]);
     speak(`Theme changed to ${themes[themeIndex]}`);
 });
 
@@ -65,6 +72,35 @@ langCycle.addEventListener('click', () => {
     if (recognition) recognition.lang = currentLang;
     speak(`Language changed to ${languages[langIndex].name}`);
 });
+
+// History Toggle
+const historyToggle = document.getElementById('historyToggle');
+const historyPanel = document.getElementById('historyPanel');
+historyToggle.addEventListener('click', () => {
+    historyPanel.style.display = historyPanel.style.display === 'none' ? 'block' : 'none';
+    updateHistoryUI();
+});
+
+// Update History UI
+function updateHistoryUI() {
+    const historyList = document.getElementById('historyList');
+    const historyInsights = document.getElementById('historyInsights');
+    historyList.innerHTML = '';
+    calculationHistory.forEach(entry => {
+        const li = document.createElement('li');
+        li.textContent = `${entry.date}: ${entry.input} = ${entry.result}`;
+        historyList.appendChild(li);
+    });
+
+    // Simple Insight Example
+    const totals = calculationHistory.filter(h => !isNaN(parseFloat(h.result))).map(h => parseFloat(h.result));
+    if (totals.length > 0) {
+        const avg = totals.reduce((a, b) => a + b, 0) / totals.length;
+        historyInsights.textContent = `Average Result: ${avg.toFixed(2)}`;
+    } else {
+        historyInsights.textContent = 'No numeric results yet.';
+    }
+}
 
 // Voice Support
 const voiceToggle = document.getElementById('voiceToggle');
@@ -174,22 +210,43 @@ if (recognition) {
             speak(timeMessages[currentLang]);
         }
 
+        // Show History
+        else if (command.includes('meri history dikhao') || command.includes('show history')) {
+            historyPanel.style.display = 'block';
+            updateHistoryUI();
+            speak('Showing your calculation history');
+        }
+
+        // Average Calculation
+        else if (command.includes('mere calculations ka average batao') || command.includes('average of my calculations')) {
+            const totals = calculationHistory.filter(h => !isNaN(parseFloat(h.result))).map(h => parseFloat(h.result));
+            if (totals.length > 0) {
+                const avg = totals.reduce((a, b) => a + b, 0) / totals.length;
+                speak(`Your average calculation result is ${avg.toFixed(2)}`);
+            } else {
+                speak('No numeric calculations in history yet');
+            }
+        }
+
         // Mathematical Expression Matching (e.g., "5 + 10")
         const match = command.match(/(\d+)\s*([\+\-\*\/])\s*(\d+)/);
         if (match) {
             let num1 = match[1];
             let operator = match[2];
             let num2 = match[3];
-
             currentInput = `${num1}${operator}${num2}`;
             display.textContent = currentInput;
             console.log('Expression:', currentInput);
-
             try {
                 currentInput = eval(currentInput).toString();
                 speakResult(currentInput);
                 display.textContent = currentInput;
                 console.log('Result:', currentInput);
+                calculationHistory.push({
+                    date: new Date().toLocaleString(),
+                    input: `${num1} ${operator} ${num2}`,
+                    result: currentInput
+                });
             } catch {
                 currentInput = 'Error';
                 speak('Error in calculation');
@@ -255,7 +312,10 @@ function speak(text) {
             'Language changed to Bengali': 'Language changed to Bengali',
             'Scanning bill': 'Scanning bill',
             'Error scanning bill': 'Error scanning bill',
-            'Scan complete': 'Scan complete'
+            'Scan complete': 'Scan complete',
+            'Showing your calculation history': 'Showing your calculation history',
+            'Your average calculation result is': 'Your average calculation result is',
+            'No numeric calculations in history yet': 'No numeric calculations in history yet'
         },
         'hi-IN': {
             'Cleared': 'साफ हो गया',
@@ -281,7 +341,10 @@ function speak(text) {
             'Language changed to Bengali': 'भाषा बंगाली में बदल गई',
             'Scanning bill': 'बिल स्कैन हो रहा है',
             'Error scanning bill': 'बिल स्कैन करने में त्रुटि',
-            'Scan complete': 'स्कैन पूरा हुआ'
+            'Scan complete': 'स्कैन पूरा हुआ',
+            'Showing your calculation history': 'आपकी गणना का इतिहास दिखा रहा हूँ',
+            'Your average calculation result is': 'आपका औसत गणना परिणाम है',
+            'No numeric calculations in history yet': 'अभी तक इतिहास में कोई संख्यात्मक गणना नहीं'
         },
         'bn-IN': {
             'Cleared': 'পরিষ্কার হয়ে গেছে',
@@ -307,7 +370,10 @@ function speak(text) {
             'Language changed to Bengali': 'ভাষা বাংলায় পরিবর্তন হয়েছে',
             'Scanning bill': 'বিল স্ক্যান হচ্ছে',
             'Error scanning bill': 'বিল স্ক্যান করতে ত্রুটি',
-            'Scan complete': 'স্ক্যান সম্পূর্ণ'
+            'Scan complete': 'স্ক্যান সম্পূর্ণ',
+            'Showing your calculation history': 'আপনার গণনার ইতিহাস দেখাচ্ছি',
+            'Your average calculation result is': 'আপনার গড় গণনার ফলাফল হল',
+            'No numeric calculations in history yet': 'এখনও ইতিহাসে কোনো সংখ্যার গণনা নেই'
         }
     };
 
@@ -391,6 +457,11 @@ billInput.addEventListener('change', async (event) => {
                     'bn-IN': `স্ক্যান সম্পূর্ণ, বিলের মোট হল ${total}`
                 };
                 speak(totalMessages[currentLang]);
+                calculationHistory.push({
+                    date: new Date().toLocaleString(),
+                    input: 'Bill Scan',
+                    result: total
+                });
             } else {
                 speak('Error scanning bill');
                 scanStatus.textContent = translations[currentLang]['Error scanning bill'] || 'Error scanning bill';
@@ -399,18 +470,4 @@ billInput.addEventListener('change', async (event) => {
             await worker.terminate();
         } catch (error) {
             console.error('Detailed scan error:', error.message, error.stack);
-            billResult.textContent = 'Error scanning bill';
-            scanStatus.textContent = translations[currentLang]['Error scanning bill'] || 'Error scanning bill';
-            scanStatus.classList.remove('scanning');
-            speak('Error scanning bill');
-            console.log('Check image quality or network connection.');
-        }
-    };
-    img.onerror = () => {
-        console.error('Image load error');
-        billResult.textContent = 'Error loading image';
-        scanStatus.textContent = translations[currentLang]['Error scanning bill'] || 'Error scanning bill';
-        scanStatus.classList.remove('scanning');
-        speak('Error scanning bill');
-    };
-});
+      

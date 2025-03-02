@@ -60,7 +60,7 @@ let recognition;
 
 try {
     recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.continuous = false; // Changed to false for manual restart control
+    recognition.continuous = false;
     recognition.interimResults = false;
     recognition.lang = currentLang;
 } catch (error) {
@@ -96,7 +96,7 @@ function startRecognition() {
         speak('Mic failed to start, check permissions');
         voiceToggle.classList.remove('active');
         isVoiceActive = false;
-        checkMicPermission(); // Check permission status
+        checkMicPermission();
     }
 }
 
@@ -179,7 +179,6 @@ if (recognition) {
             speak('Please repeat the command clearly');
         }
 
-        // Manual Restart for Better Control
         recognition.stop();
         if (isVoiceActive) setTimeout(startRecognition, 1500);
     };
@@ -193,14 +192,12 @@ if (recognition) {
         speak(errorMessage);
         voiceToggle.classList.remove('active');
         isVoiceActive = false;
-        checkMicPermission(); // Check permission on error
+        checkMicPermission();
     };
 
     recognition.onend = () => {
         console.log('Voice recognition stopped');
-        if (isVoiceActive) {
-            setTimeout(startRecognition, 1500); // Consistent restart delay
-        }
+        if (isVoiceActive) setTimeout(startRecognition, 1500);
     };
 }
 
@@ -228,7 +225,9 @@ function speak(text) {
             'Theme changed to colorful': 'Theme changed to colorful',
             'Language changed to English': 'Language changed to English',
             'Language changed to Hindi': 'Language changed to Hindi',
-            'Language changed to Bengali': 'Language changed to Bengali'
+            'Language changed to Bengali': 'Language changed to Bengali',
+            'Scanning bill': 'Scanning bill',
+            'Error scanning bill': 'Error scanning bill'
         },
         'hi-IN': {
             'Cleared': 'साफ हो गया',
@@ -251,7 +250,9 @@ function speak(text) {
             'Theme changed to colorful': 'थीम रंगीन में बदल गई',
             'Language changed to English': 'भाषा अंग्रेजी में बदल गई',
             'Language changed to Hindi': 'भाषा हिंदी में बदल गई',
-            'Language changed to Bengali': 'भाषा बंगाली में बदल गई'
+            'Language changed to Bengali': 'भाषा बंगाली में बदल गई',
+            'Scanning bill': 'बिल स्कैन हो रहा है',
+            'Error scanning bill': 'बिल स्कैन करने में त्रुटि'
         },
         'bn-IN': {
             'Cleared': 'পরিষ্কার হয়ে গেছে',
@@ -274,7 +275,9 @@ function speak(text) {
             'Theme changed to colorful': 'থিম রঙিনে পরিবর্তন হয়েছে',
             'Language changed to English': 'ভাষা ইংরেজিতে পরিবর্তন হয়েছে',
             'Language changed to Hindi': 'ভাষা হিন্দিতে পরিবর্তন হয়েছে',
-            'Language changed to Bengali': 'ভাষা বাংলায় পরিবর্তন হয়েছে'
+            'Language changed to Bengali': 'ভাষা বাংলায় পরিবর্তন হয়েছে',
+            'Scanning bill': 'বিল স্ক্যান হচ্ছে',
+            'Error scanning bill': 'বিল স্ক্যান করতে ত্রুটি'
         }
     };
 
@@ -298,4 +301,50 @@ function speakResult(result) {
         'bn-IN': `ফলাফল হল ${result}`
     };
     speak(messages[currentLang]);
+}
+
+// Smart Bill Scanner (Handwritten Detection)
+const billInput = document.getElementById('billInput');
+const billResult = document.getElementById('billResult');
+
+billInput.addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    speak('Scanning bill');
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    img.onload = async () => {
+        try {
+            const { data: { text } } = await Tesseract.recognize(img, 'eng', {
+                tessedit_char_whitelist: '0123456789₹$.TotalAMOUNT', // Focus on numbers and key terms
+                tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK, // Better for handwritten
+                oem: Tesseract.OEM.LSTM_ONLY // Improved for handwritten text
+            });
+            console.log('Bill text:', text);
+
+            // Extract total from handwritten bill
+            const totalMatch = text.match(/(?:Total|TOTAL|Amount|AMOUNT)[:\s]*[₹$]?(\d+(?:\.\d{1,2})?)/i) ||
+                              text.match(/(\d+(?:\.\d{1,2})?)$/); // Fallback to last number if "Total" not found
+            const total = totalMatch ? totalMatch[1] : 'Not Found';
+            billResult.textContent = `Total: ${total}`;
+
+            if (total !== 'Not Found') {
+                currentInput = total;
+                display.textContent = currentInput;
+                const totalMessages = {
+                    'en-IN': `The bill total is ${total}`,
+                    'hi-IN': `बिल का कुल योग है ${total}`,
+                    'bn-IN': `বিলের মোট হল ${total}`
+                };
+                speak(totalMessages[currentLang]);
+            } else {
+                speak('Error scanning bill');
+            }
+        } catch (error) {
+            console.error('Scan error:', error);
+            billResult.textContent = 'Error scanning bill';
+            speak('Error scanning bill');
         }
+    };
+});

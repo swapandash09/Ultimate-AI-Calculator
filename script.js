@@ -320,7 +320,7 @@ function speakResult(result) {
     speak(messages[currentLang]);
 }
 
-// Smart Bill Scanner (Instant Scan with Feedback)
+// Smart Bill Scanner (Fixed Scanning)
 const billInput = document.getElementById('billInput');
 const billResult = document.getElementById('billResult');
 const scanStatus = document.getElementById('scanStatus');
@@ -336,8 +336,18 @@ billInput.addEventListener('change', async (event) => {
 
     const img = new Image();
     img.src = URL.createObjectURL(file);
+
     img.onload = async () => {
         try {
+            // Optimize image for better OCR
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            ctx.filter = 'contrast(1.5) grayscale(1)'; // Enhance contrast and grayscale
+            const enhancedImg = canvas.toDataURL('image/jpeg');
+
             const worker = await Tesseract.createWorker('eng', Tesseract.OEM.LSTM_ONLY, {
                 workerPath: 'https://unpkg.com/tesseract.js@v5.0.4/dist/worker.min.js',
                 langPath: 'https://tessdata.projectnaptha.com/4.0.0_best',
@@ -345,14 +355,16 @@ billInput.addEventListener('change', async (event) => {
             });
             await worker.setParameters({
                 tessedit_char_whitelist: '0123456789₹$.TotalAMOUNT',
-                tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK
+                tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
+                user_defined_dpi: '70' // Improve recognition for low-res images
             });
 
-            const { data: { text } } = await worker.recognize(img);
+            const { data: { text } } = await worker.recognize(enhancedImg);
             console.log('Bill text:', text);
 
-            const totalMatch = text.match(/(?:Total|TOTAL|Amount|AMOUNT)[:\s]*[₹$]?(\d+(?:\.\d{1,2})?)/i) ||
-                              text.match(/(\d+(?:\.\d{1,2})?)$/);
+            // More robust total detection
+            const totalMatch = text.match(/(?:Total|TOTAL|Amount|AMOUNT|Sum|SUM)[:\s]*[₹$]?(\d+(?:\.\d{1,2})?)/i) ||
+                              text.match(/(\d+(?:\.\d{1,2})?)(?:\s*$|\s+[^\d])/i); // Fallback to last standalone number
             const total = totalMatch ? totalMatch[1] : 'Not Found';
             billResult.textContent = `Total: ${total}`;
 
@@ -377,11 +389,19 @@ billInput.addEventListener('change', async (event) => {
 
             await worker.terminate();
         } catch (error) {
-            console.error('Scan error:', error);
+            console.error('Detailed scan error:', error.message, error.stack);
             billResult.textContent = 'Error scanning bill';
             scanStatus.textContent = translations[currentLang]['Error scanning bill'] || 'Error scanning bill';
             scanStatus.classList.remove('scanning');
             speak('Error scanning bill');
+            console.log('Check image quality or network connection.');
         }
+    };
+    img.onerror = () => {
+        console.error('Image load error');
+        billResult.textContent = 'Error loading image';
+        scanStatus.textContent = translations[currentLang]['Error scanning bill'] || 'Error scanning bill';
+        scanStatus.classList.remove('scanning');
+        speak('Error scanning bill');
     };
 });

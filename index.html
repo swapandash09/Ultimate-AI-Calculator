@@ -27,6 +27,7 @@
                 <span class="mic-icon"></span>
             </button>
             <div class="display" id="display">0</div>
+            <button id="historyToggle" class="history-btn">History</button>
         </div>
         <div class="controls">
             <button id="theme-cycle" class="control-btn">Theme</button>
@@ -57,6 +58,11 @@
             <button class="operator">/</button>
         </div>
         <div class="footer">Powered by SD</div>
+        <div class="history-panel" id="historyPanel" style="display: none;">
+            <h3>Calculation History</h3>
+            <ul id="historyList"></ul>
+            <div id="historyInsights"></div>
+        </div>
     </div>
     <script src="https://unpkg.com/tesseract.js@v5.0.4/dist/tesseract.min.js"></script>
     <script src="script.js"></script>

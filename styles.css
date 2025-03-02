@@ -34,7 +34,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(30, 30, 30, 0.95);
+    background: rgba(0, 0, 0, 0.9);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -48,34 +48,34 @@ body {
     pointer-events: none;
 }
 .intro-logo {
-    width: 120px;
-    height: 120px;
-    margin-bottom: 25px;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
     animation: pulseLogo 2s ease infinite;
 }
 .intro-logo svg {
     width: 100%;
     height: 100%;
-    filter: drop-shadow(0 0 15px rgba(0, 255, 204, 0.8));
+    filter: drop-shadow(0 0 10px rgba(0, 255, 204, 0.8));
 }
 @keyframes pulseLogo {
     0% { transform: scale(1); }
-    50% { transform: scale(1.15); }
+    50% { transform: scale(1.1); }
     100% { transform: scale(1); }
 }
 .intro-title {
-    font-size: 3em;
+    font-size: 3.5em;
     color: #fff;
     text-shadow: 0 5px 15px rgba(0, 255, 204, 0.8), 0 0 5px rgba(255, 255, 255, 0.5);
     animation: fadeIn 1s ease forwards;
 }
 .intro-tagline {
-    font-size: 1.4em;
-    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.5em;
+    color: rgba(255, 255, 255, 0.9);
     margin-top: 10px;
     text-shadow: 0 2px 10px rgba(0, 191, 255, 0.6);
     font-style: italic;
-    letter-spacing: 1.5px;
+    letter-spacing: 1px;
     animation: fadeIn 1.5s ease forwards;
 }
 @keyframes fadeIn {
@@ -84,10 +84,10 @@ body {
 }
 
 .calculator-container {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(20px);
-    padding: 20px;
-    border-radius: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+    padding: 15px;
+    border-radius: 35px;
     width: 100%;
     max-width: 100%;
     height: 100vh;
@@ -109,8 +109,8 @@ body.dark {
     background: linear-gradient(45deg, #0f0c29, #302b63);
 }
 body.dark .calculator-container {
-    background: rgba(40, 40, 40, 0.95);
-    color: #e0e0e0;
+    background: rgba(30, 30, 30, 0.95);
+    color: #fff;
 }
 body.dark .display,
 body.dark .control-btn,
@@ -122,16 +122,16 @@ body.dark .scan-status,
 body.dark .history-panel h3,
 body.dark .history-panel li,
 body.dark #historyInsights {
-    color: #e0e0e0;
+    color: #fff;
 }
 body.dark .display {
-    background: rgba(80, 80, 80, 0.3);
+    background: rgba(255, 255, 255, 0.1);
 }
 body.colorful {
     background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
 }
 body.colorful .calculator-container {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.25);
     color: #333;
 }
 body.colorful .display,
@@ -147,14 +147,14 @@ body.colorful #historyInsights {
     color: #333;
 }
 body.colorful .display {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.2);
 }
 body.light {
-    background: linear-gradient(45deg, #f0f0f0, #ffffff);
+    background: linear-gradient(45deg, #e0e0e0, #f5f5f5);
 }
 body.light .calculator-container {
-    background: rgba(240, 240, 240, 0.95); /* Brighter and solid */
-    color: #1a1a1a; /* Darker for contrast */
+    background: rgba(245, 245, 245, 0.9);
+    color: #222;
 }
 body.light .display,
 body.light .control-btn,
@@ -166,18 +166,16 @@ body.light .scan-status,
 body.light .history-panel h3,
 body.light .history-panel li,
 body.light #historyInsights {
-    color: #1a1a1a;
+    color: #222;
 }
 body.light .display {
-    background: rgba(255, 255, 255, 0.7); /* High contrast */
+    background: rgba(255, 255, 255, 0.5);
 }
-body.light .control-btn {
-    background: linear-gradient(135deg, #d0d0d0, #b0b0b0); /* Subtle gradient */
-}
+body.light .control-btn,
 body.light button {
-    background: rgba(220, 220, 220, 0.8);
+    background: rgba(200, 200, 200, 0.6);
 }
-body.light .number { background: rgba(230, 230, 230, 0.85); }
+body.light .number { background: rgba(220, 220, 220, 0.65); }
 body.light .operator { background: linear-gradient(135deg, #ff8c00, #ff4500); }
 body.light .clear { background: linear-gradient(135deg, #ffa500, #ff6347); }
 body.light .equals { background: linear-gradient(135deg, #00ced1, #20b2aa); }
@@ -186,40 +184,39 @@ body.light .equals { background: linear-gradient(135deg, #00ced1, #20b2aa); }
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .display {
     background: rgba(255, 255, 255, 0.15);
-    padding: 20px;
+    padding: 15px;
     text-align: center;
-    font-size: 3em; /* Increased for comfort */
+    font-size: 2.5em;
     overflow-x: auto;
-    width: 85%;
-    margin: 15px auto;
-    border-radius: 20px;
-    box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    margin: 0 auto;
+    border-radius: 15px;
+    box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .controls {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 10px;
     padding: 10px;
     background: rgba(255, 255, 255, 0.05);
 }
 
 .control-btn {
-    padding: 10px 20px;
+    padding: 8px 16px;
     border: none;
-    border-radius: 30px;
+    border-radius: 25px;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
     color: inherit;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 1.1em; /* Slightly larger */
+    font-size: 1em;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 .control-btn:hover {
@@ -233,16 +230,16 @@ body.light .equals { background: linear-gradient(135deg, #00ced1, #20b2aa); }
 .buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    padding: 15px;
+    gap: 5px;
+    padding: 10px;
     flex-grow: 2;
 }
 
 button {
-    padding: 20px;
-    font-size: 1.8em; /* Increased for comfort */
+    padding: 15px;
+    font-size: 1.5em;
     border: none;
-    border-radius: 15px;
+    border-radius: 10px;
     background: rgba(255, 255, 255, 0.3);
     color: #fff;
     cursor: pointer;
@@ -251,7 +248,6 @@ button {
 }
 button:hover {
     background: rgba(255, 255, 255, 0.45);
-    transform: scale(1.05);
 }
 button:active {
     transform: scale(0.95);
@@ -265,14 +261,14 @@ button:active {
 .voice-btn {
     background: linear-gradient(135deg, #ffd700, #ff4500);
     border-radius: 50%;
-    width: 50px; /* Slightly larger */
-    height: 50px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: 15px;
-    left: 15px;
+    top: 10px;
+    left: 10px;
     cursor: pointer;
     transition: all 0.4s ease;
     box-shadow: 0 5px 20px rgba(255, 215, 0, 0.6);
@@ -304,8 +300,8 @@ button:active {
     100% { box-shadow: 0 0 0 0 rgba(0, 206, 209, 0); }
 }
 .mic-icon {
-    width: 28px; /* Larger for comfort */
-    height: 28px;
+    width: 24px;
+    height: 24px;
     background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 15c2.21 0 4-1.79 4-4V5c0-2.21-1.79-4-4-4S8 2.79 8 5v6c0 2.21 1.79 4 4 4zm0-2c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2s2 .9 2 2v6c0 1.1-.9 2-2 2zm-6 2v2h12v-2H6zm6 4c-3.31 0-6-2.69-6-6h-2c0 4.41 3.59 8 8 8s8-3.59 8-8h-2c0 3.31-2.69 6-6 6z"/></svg>') no-repeat center;
     background-size: contain;
     transition: transform 0.4s ease;
@@ -315,44 +311,42 @@ button:active {
 }
 
 .bill-scanner {
-    padding: 15px;
+    padding: 10px;
     text-align: center;
     color: inherit;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
 }
 .bill-scanner label { 
-    font-size: 1.2em; 
+    font-size: 1em; 
     text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 #billInput { 
-    padding: 10px; 
-    border-radius: 12px; 
+    padding: 8px; 
+    border-radius: 10px; 
     background: rgba(255, 255, 255, 0.25); 
     color: #fff; 
     border: none; 
     width: 100%;
-    font-size: 1em;
 }
 #billInput:hover {
     background: rgba(255, 255, 255, 0.35);
 }
 #billResult { 
-    margin-top: 8px; 
-    font-size: 1.2em; 
+    margin-top: 5px; 
+    font-size: 1em; 
     background: rgba(255, 255, 255, 0.1); 
-    padding: 8px; 
-    border-radius: 12px;
+    padding: 5px; 
+    border-radius: 10px;
 }
 .scan-status {
-    font-size: 1em;
+    font-size: 0.8em;
     color: rgba(255, 255, 255, 0.8);
     background: rgba(0, 255, 204, 0.2);
-    padding: 6px;
-    border-radius: 10px;
+    padding: 5px;
+    border-radius: 8px;
 }
 .scan-status.scanning {
     background: rgba(255, 215, 0, 0.3);
@@ -365,23 +359,22 @@ button:active {
 
 .footer {
     text-align: center;
-    padding: 10px;
+    padding: 5px;
     color: inherit;
-    font-size: 0.9em;
+    font-size: 0.8em;
     text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     background: rgba(255, 255, 255, 0.05);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .history-btn {
-    padding: 10px 20px;
+    padding: 8px 16px;
     border: none;
-    border-radius: 30px;
+    border-radius: 25px;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
     color: inherit;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 1.1em;
+    font-size: 1em;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 .history-btn:hover {
@@ -391,20 +384,20 @@ button:active {
 
 .history-panel {
     position: absolute;
-    top: 70px;
-    right: 15px;
-    width: 320px;
-    max-height: 450px;
+    top: 60px;
+    right: 10px;
+    width: 300px;
+    max-height: 400px;
     background: rgba(255, 255, 255, 0.9);
-    border-radius: 20px;
-    padding: 15px;
+    border-radius: 15px;
+    padding: 10px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
     overflow-y: auto;
     z-index: 10;
 }
 .history-panel h3 {
-    font-size: 1.4em;
-    margin-bottom: 15px;
+    font-size: 1.2em;
+    margin-bottom: 10px;
     color: #333;
 }
 .history-panel ul {
@@ -412,24 +405,22 @@ button:active {
     padding: 0;
 }
 .history-panel li {
-    padding: 8px 0;
+    padding: 5px 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     color: #333;
-    font-size: 1em;
 }
 #historyInsights {
-    margin-top: 15px;
+    margin-top: 10px;
     font-style: italic;
     color: #555;
-    font-size: 0.9em;
 }
 body.dark .history-panel {
-    background: rgba(40, 40, 40, 0.95);
+    background: rgba(30, 30, 30, 0.95);
 }
 body.dark .history-panel h3,
 body.dark .history-panel li,
 body.dark #historyInsights {
-    color: #e0e0e0;
+    color: #fff;
 }
 
 /* Responsive Design */
@@ -441,13 +432,13 @@ body.dark #historyInsights {
         font-size: 1.2em;
     }
     .display {
-        font-size: 2.2em;
+        font-size: 2em;
     }
     button {
-        font-size: 1.5em;
+        font-size: 1.3em;
     }
     .history-panel {
-        width: 280px;
+        width: 250px;
     }
 }
 
@@ -459,20 +450,19 @@ body.dark #historyInsights {
         font-size: 1em;
     }
     .display {
-        font-size: 2em;
+        font-size: 1.8em;
         width: 90%;
     }
     button {
-        font-size: 1.3em;
-        padding: 15px;
+        font-size: 1.2em;
     }
     .control-btn,
     .history-btn {
-        padding: 8px 16px;
-        font-size: 1em;
+        padding: 6px 12px;
+        font-size: 0.9em;
     }
     .history-panel {
-        width: 240px;
-        max-height: 350px;
+        width: 200px;
+        max-height: 300px;
     }
 }

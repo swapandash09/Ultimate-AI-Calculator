@@ -66,12 +66,13 @@ if (themeCycle) {
         themeIndex = (themeIndex + 1) % themes.length;
         applyTheme(themes[themeIndex]);
         speak(`Theme changed to ${themes[themeIndex]}`);
+        console.log('Theme changed to:', themes[themeIndex]);
     });
 }
 
 function applyTheme(theme) {
     document.body.className = theme;
-    console.log('Theme switched to:', theme);
+    console.log('Applied theme:', theme);
 }
 
 // Language Cycling
@@ -134,9 +135,9 @@ const maxRecognitionAttempts = 3;
 let lastVoiceToggleTime = 0;
 
 function initializeRecognition() {
-    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+    if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
         console.error('SpeechRecognition not supported in this browser.');
-        speak('Voice recognition is not supported. Please use Chrome.');
+        speak('Voice recognition is not supported. Please use Chrome or Edge.');
         voiceToggle.disabled = true;
         voiceToggle.style.opacity = '0.5';
         voiceToggle.style.cursor = 'not-allowed';
@@ -148,6 +149,9 @@ function initializeRecognition() {
         recognition.continuous = false;
         recognition.interimResults = false;
         recognition.lang = currentLang;
+        recognition.onstart = () => console.log('Voice recognition started');
+        recognition.onerror = (event) => console.error('Voice recognition error:', event.error);
+        recognition.onend = () => console.log('Voice recognition ended');
         console.log('SpeechRecognition initialized successfully');
         return true;
     } catch (error) {
@@ -162,15 +166,10 @@ async function checkMicPermission() {
         console.log('Microphone permission state:', result.state);
         if (result.state === 'denied') {
             speak('Microphone permission is denied. Please enable it in your browser settings.');
-            console.log('Go to Chrome Settings > Privacy and Security > Site Settings > Microphone to allow access.');
+            console.log('Go to Settings > Privacy and Security > Microphone to allow access.');
             return false;
-        } else if (result.state === 'prompt') {
-            console.log('Microphone permission not yet granted. Requesting permission...');
-            return true;
-        } else if (result.state === 'granted') {
-            console.log('Microphone permission granted.');
-            return true;
         }
+        return result.state !== 'denied';
     } catch (error) {
         console.error('Error checking microphone permission:', error);
         speak('Error checking microphone permission. Please check your browser settings.');
@@ -186,12 +185,12 @@ async function startRecognition() {
             if (initializeRecognition()) {
                 setTimeout(startRecognition, 1000);
             } else {
-                speak('Voice recognition unavailable. Please use Chrome.');
+                speak('Voice recognition unavailable. Please use Chrome or Edge.');
             }
             return;
         } else {
             console.error('Failed to initialize SpeechRecognition after retries');
-            speak('Voice recognition unavailable. Please use Chrome.');
+            speak('Voice recognition unavailable. Please use Chrome or Edge.');
             voiceToggle.disabled = true;
             voiceToggle.style.opacity = '0.5';
             voiceToggle.style.cursor = 'not-allowed';
@@ -210,6 +209,7 @@ async function startRecognition() {
         recognition.start();
         isVoiceActive = true;
         console.log('Microphone is ON, speak now...');
+        voiceToggle.classList.add('active');
     } catch (error) {
         console.error('Microphone start error:', error);
         speak('Failed to start microphone. Please ensure your microphone is connected and permissions are granted.');
@@ -229,7 +229,6 @@ if (voiceToggle) {
         if (!isVoiceActive) {
             await startRecognition();
             if (isVoiceActive) {
-                voiceToggle.classList.add('active');
                 speak('Voice control activated');
             }
         } else {
@@ -243,8 +242,8 @@ if (voiceToggle) {
 
 if (recognition) {
     recognition.onresult = (event) => {
-        const command = event.results[0][0].transcript.toLowerCase();
-        console.log('Heard:', command);
+        const command = event.results[0][0].transcript.toLowerCase().trim();
+        console.log('Heard command:', command);
 
         if (command.includes('change to hindi') || command.includes('hindi mein badlo')) {
             currentLang = 'hi-IN';
@@ -331,7 +330,6 @@ if (recognition) {
             }
         }
 
-        recognition.stop();
         if (isVoiceActive) setTimeout(startRecognition, 1500);
     };
 
@@ -383,7 +381,7 @@ function speak(text) {
             'Showing your calculation history': 'Showing your calculation history',
             'Your average calculation result is': 'Your average calculation result is',
             'No numeric calculations in history yet': 'No numeric calculations in history yet',
-            'Voice recognition unavailable. Please use Chrome.': 'Voice recognition unavailable. Please use Chrome.',
+            'Voice recognition unavailable. Please use Chrome or Edge.': 'Voice recognition unavailable. Please use Chrome or Edge.',
             'Microphone permission is denied. Please enable it in your browser settings.': 'Microphone permission is denied. Please enable it in your browser settings.',
             'Error checking microphone permission. Please check your browser settings.': 'Error checking microphone permission. Please check your browser settings.',
             'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.': 'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.'
@@ -416,7 +414,7 @@ function speak(text) {
             'Showing your calculation history': 'आपकी गणना का इतिहास दिखा रहा हूँ',
             'Your average calculation result is': 'आपका औसत गणना परिणाम है',
             'No numeric calculations in history yet': 'अभी तक इतिहास में कोई संख्यात्मक गणना नहीं',
-            'Voice recognition unavailable. Please use Chrome.': 'वॉइस रिकग्निशन उपलब्ध नहीं है। कृपया क्रोम का उपयोग करें।',
+            'Voice recognition unavailable. Please use Chrome or Edge.': 'वॉइस रिकग्निशन उपलब्ध नहीं है। कृपया क्रोम या एज का उपयोग करें।',
             'Microphone permission is denied. Please enable it in your browser settings.': 'माइक अनुमति अस्वीकृत है। कृपया अपनी ब्राउज़र सेटिंग्स में इसे सक्षम करें।',
             'Error checking microphone permission. Please check your browser settings.': 'माइक अनुमति जाँचने में त्रुटि। कृपया अपनी ब्राउज़र सेटिंग्स जाँचें।',
             'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.': 'माइक शुरू करने में असफल। कृपया सुनिश्चित करें कि माइक कनेक्ट है और अनुमतियाँ दी गई हैं।'
@@ -449,7 +447,7 @@ function speak(text) {
             'Showing your calculation history': 'আপনার গণনার ইতিহাস দেখাচ্ছি',
             'Your average calculation result is': 'আপনার গড় গণনার ফলাফল হল',
             'No numeric calculations in history yet': 'এখনও ইতিহাসে কোনো সংখ্যার গণনা নেই',
-            'Voice recognition unavailable. Please use Chrome.': 'ভয়েস রিকগনিশন উপলব্ধ নয়। দয়া করে ক্রোম ব্যবহার করুন।',
+            'Voice recognition unavailable. Please use Chrome or Edge.': 'ভয়েস রিকগনিশন উপলব্ধ নয়। দয়া করে ক্রোম বা এজ ব্যবহার করুন।',
             'Microphone permission is denied. Please enable it in your browser settings.': 'মাইকের অনুমতি প্রত্যাখ্যাত। দয়া করে আপনার ব্রাউজার সেটিংসে এটি সক্ষম করুন।',
             'Error checking microphone permission. Please check your browser settings.': 'মাইক অনুমতি পরীক্ষা করতে ত্রুটি। দয়া করে আপনার ব্রাউজার সেটিংস পরীক্ষা করুন।',
             'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.': 'মাইক চালু করতে ব্যর্থ। দয়া করে নিশ্চিত করুন মাইক সংযুক্ত আছে এবং অনুমতি দেওয়া হয়েছে।'
@@ -478,7 +476,7 @@ function speakResult(result) {
     speak(messages[currentLang]);
 }
 
-// Smart Bill Scanner
+// Smart Bill Scanner with File Size Optimization
 const billInput = document.getElementById('billInput');
 const billResult = document.getElementById('billResult');
 const scanStatus = document.getElementById('scanStatus');
@@ -497,13 +495,21 @@ if (billInput && billResult && scanStatus) {
 
         img.onload = async () => {
             try {
+                // Compress image to reduce file size
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
-                ctx.filter = 'contrast(2) grayscale(1) brightness(1.2)';
-                const enhancedImg = canvas.toDataURL('image/jpeg', 0.8);
+                const maxWidth = 800; // Reduce to max 800px width
+                let width = img.width;
+                let height = img.height;
+                if (width > maxWidth) {
+                    height = (maxWidth / width) * height;
+                    width = maxWidth;
+                }
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+                ctx.filter = 'contrast(1.5) brightness(1.1)'; // Lighter filter to reduce processing
+                const compressedImg = canvas.toDataURL('image/jpeg', 0.5); // Compress to 50% quality
 
                 const worker = await Tesseract.createWorker('eng', Tesseract.OEM.LSTM_ONLY, {
                     workerPath: 'https://unpkg.com/tesseract.js@v5.0.4/dist/worker.min.js',
@@ -513,10 +519,10 @@ if (billInput && billResult && scanStatus) {
                 await worker.setParameters({
                     tessedit_char_whitelist: '0123456789₹$.TotalAMOUNT',
                     tessedit_pageseg_mode: Tesseract.PSM.AUTO,
-                    user_defined_dpi: '300'
+                    user_defined_dpi: '200' // Reduced DPI for performance
                 });
 
-                const { data: { text } } = await worker.recognize(enhancedImg);
+                const { data: { text } } = await worker.recognize(compressedImg);
                 console.log('Bill text:', text);
 
                 const totalMatch = text.match(/(?:Total|TOTAL|Amount|AMOUNT|Sum|SUM|Final|Grand Total)[:\s]*[₹$]?(\d+\.?\d{0,2})/i) ||
@@ -548,6 +554,8 @@ if (billInput && billResult && scanStatus) {
                 }
 
                 await worker.terminate();
+                // Cleanup URL object to free memory
+                URL.revokeObjectURL(img.src);
             } catch (error) {
                 console.error('Detailed scan error:', error.message, error.stack);
                 billResult.textContent = 'Error scanning bill';

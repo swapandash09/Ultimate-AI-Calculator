@@ -4,6 +4,123 @@ const script = document.createElement('script');
 script.src = 'https://unpkg.com/mathjs@12.4.2/lib/browser/math.js';
 document.head.appendChild(script);
 
+// Define speak function early
+function speak(text) {
+    const translations = {
+        'en-IN': {
+            'Cleared': 'Cleared',
+            'Plus': 'Plus',
+            'Minus': 'Minus',
+            'Multiply': 'Multiply',
+            'Divide': 'Divide',
+            'Number': 'Number',
+            'Error in calculation': 'Error in calculation',
+            'Please repeat the command clearly': 'Please repeat the command clearly',
+            'Voice control activated': 'Voice control activated',
+            'Voice control stopped': 'Voice control stopped',
+            'Voice error, please try again': 'Voice error, please try again',
+            'Mic failed to start, check permissions': 'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.',
+            'No speech detected, please speak': 'No speech detected, please speak',
+            'Mic not found, check your device': 'Microphone not found, please check your device',
+            'Mic permission denied, allow it': 'Microphone permission denied, please enable it in browser settings',
+            'Theme changed to light': 'Theme changed to light',
+            'Theme changed to dark': 'Theme changed to dark',
+            'Theme changed to colorful': 'Theme changed to colorful',
+            'Language changed to English': 'Language changed to English',
+            'Language changed to Hindi': 'Language changed to Hindi',
+            'Language changed to Bengali': 'Language changed to Bengali',
+            'Scanning bill': 'Scanning bill',
+            'Error scanning bill': 'Error scanning bill',
+            'Scan complete': 'Scan complete',
+            'Showing your calculation history': 'Showing your calculation history',
+            'Your average calculation result is': 'Your average calculation result is',
+            'No numeric calculations in history yet': 'No numeric calculations in history yet',
+            'Voice recognition unavailable. Please use Chrome or Edge.': 'Voice recognition unavailable. Please use Chrome or Edge.'
+        },
+        'hi-IN': {
+            'Cleared': 'साफ हो गया',
+            'Plus': 'जोड़',
+            'Minus': 'घटाव',
+            'Multiply': 'गुणा',
+            'Divide': 'भाग',
+            'Number': 'नंबर',
+            'Error in calculation': 'गणना में त्रुटि',
+            'Please repeat the command clearly': 'कृपया कमांड को स्पष्ट रूप से दोहराएं',
+            'Voice control activated': 'वॉइस कंट्रोल शुरू हो गया',
+            'Voice control stopped': 'वॉइस कंट्रोल बंद हो गया',
+            'Voice error, please try again': 'वॉइस में त्रुटि, कृपया फिर से कोशिश करें',
+            'Mic failed to start, check permissions': 'माइक शुरू करने में असफल, कृपया सुनिश्चित करें कि माइक कनेक्ट है और अनुमतियाँ दी गई हैं।',
+            'No speech detected, please speak': 'कोई आवाज नहीं मिली, कृपया बोलें',
+            'Mic not found, check your device': 'माइक नहीं मिला, अपने डिवाइस की जांच करें',
+            'Mic permission denied, allow it': 'माइक अनुमति अस्वीकृत, कृपया ब्राउज़र सेटिंग्स में इसे सक्षम करें',
+            'Theme changed to light': 'थीम लाइट में बदल गई',
+            'Theme changed to dark': 'थीम डार्क में बदल गई',
+            'Theme changed to colorful': 'थीम रंगीन में बदल गई',
+            'Language changed to English': 'भाषा अंग्रेजी में बदल गई',
+            'Language changed to Hindi': 'भाषा हिंदी में बदल गई',
+            'Language changed to Bengali': 'भाषा बंगाली में बदल गई',
+            'Scanning bill': 'बिल स्कैन हो रहा है',
+            'Error scanning bill': 'बिल स्कैन करने में त्रुटि',
+            'Scan complete': 'स्कैन पूरा हुआ',
+            'Showing your calculation history': 'आपकी गणना का इतिहास दिखा रहा हूँ',
+            'Your average calculation result is': 'आपका औसत गणना परिणाम है',
+            'No numeric calculations in history yet': 'अभी तक इतिहास में कोई संख्यात्मक गणना नहीं',
+            'Voice recognition unavailable. Please use Chrome or Edge.': 'वॉइस रिकग्निशन उपलब्ध नहीं है। कृपया क्रोम या एज का उपयोग करें।'
+        },
+        'bn-IN': {
+            'Cleared': 'পরিষ্কার হয়ে গেছে',
+            'Plus': 'যোগ',
+            'Minus': 'বিয়োগ',
+            'Multiply': 'গুণ',
+            'Divide': 'ভাগ',
+            'Number': 'নম্বর',
+            'Error in calculation': 'গণনায় ত্রুটি',
+            'Please repeat the command clearly': 'দয়া করে কমান্ডটি স্পষ্টভাবে পুনরাবৃত্তি করুন',
+            'Voice control activated': 'ভয়েস নিয়ন্ত্রণ চালু হয়েছে',
+            'Voice control stopped': 'ভয়েস নিয়ন্ত্রণ বন্ধ হয়েছে',
+            'Voice error, please try again': 'ভয়েসে ত্রুটি, আবার চেষ্টা করুন',
+            'Mic failed to start, check permissions': 'মাইক চালু করতে ব্যর্থ, দয়া করে নিশ্চিত করুন মাইক সংযুক্ত আছে এবং অনুমতি দেওয়া হয়েছে।',
+            'No speech detected, please speak': 'কোনো শব্দ শনাক্ত হয়নি, বলুন',
+            'Mic not found, check your device': 'মাইক পাওয়া যায়নি, আপনার ডিভাইস চেক করুন',
+            'Mic permission denied, allow it': 'মাইকের অনুমতি প্রত্যাখ্যাত, দয়া করে ব্রাউজার সেটিংসে এটি সক্ষম করুন',
+            'Theme changed to light': 'থিম লাইটে পরিবর্তন হয়েছে',
+            'Theme changed to dark': 'থিম গাঢ়ে পরিবর্তন হয়েছে',
+            'Theme changed to colorful': 'থিম রঙিনে পরিবর্তন হয়েছে',
+            'Language changed to English': 'ভাষা ইংরেজিতে পরিবর্তন হয়েছে',
+            'Language changed to Hindi': 'ভাষা হিন্দিতে পরিবর্তন হয়েছে',
+            'Language changed to Bengali': 'ভাষা বাংলায় পরিবর্তন হয়েছে',
+            'Scanning bill': 'বিল স্ক্যান হচ্ছে',
+            'Error scanning bill': 'বিল স্ক্যান করতে ত্রুটি',
+            'Scan complete': 'স্ক্যান সম্পূর্ণ',
+            'Showing your calculation history': 'আপনার গণনার ইতিহাস দেখাচ্ছি',
+            'Your average calculation result is': 'আপনার গড় গণনার ফলাফল হল',
+            'No numeric calculations in history yet': 'এখনও ইতিহাসে কোনো সংখ্যার গণনা নেই',
+            'Voice recognition unavailable. Please use Chrome or Edge.': 'ভয়েস রিকগনিশন উপলব্ধ নয়। দয়া করে ক্রোম বা এজ ব্যবহার করুন।'
+        }
+    };
+
+    const translatedText = translations[currentLang][text] || text;
+    const utterance = new SpeechSynthesisUtterance(translatedText);
+    utterance.lang = currentLang;
+    utterance.volume = 1;
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+    utterance.onstart = () => console.log('TTS started:', translatedText);
+    utterance.onend = () => console.log('TTS ended');
+    utterance.onerror = (e) => console.error('TTS error:', e.error);
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+}
+
+function speakResult(result) {
+    const messages = {
+        'en-IN': `The result is ${result}`,
+        'hi-IN': `जवाब है ${result}`,
+        'bn-IN': `ফলাফল হল ${result}`
+    };
+    speak(messages[currentLang]);
+}
+
 // Calculator Logic
 const display = document.querySelector('.display');
 const buttons = document.querySelectorAll('.buttons button');
@@ -351,132 +468,7 @@ if (recognition) {
     };
 }
 
-function speak(text) {
-    const translations = {
-        'en-IN': {
-            'Cleared': 'Cleared',
-            'Plus': 'Plus',
-            'Minus': 'Minus',
-            'Multiply': 'Multiply',
-            'Divide': 'Divide',
-            'Number': 'Number',
-            'Error in calculation': 'Error in calculation',
-            'Please repeat the command clearly': 'Please repeat the command clearly',
-            'Voice control activated': 'Voice control activated',
-            'Voice control stopped': 'Voice control stopped',
-            'Voice error, please try again': 'Voice error, please try again',
-            'Mic failed to start, check permissions': 'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.',
-            'No speech detected, please speak': 'No speech detected, please speak',
-            'Mic not found, check your device': 'Microphone not found, please check your device',
-            'Mic permission denied, allow it': 'Microphone permission denied, please enable it in browser settings',
-            'Theme changed to light': 'Theme changed to light',
-            'Theme changed to dark': 'Theme changed to dark',
-            'Theme changed to colorful': 'Theme changed to colorful',
-            'Language changed to English': 'Language changed to English',
-            'Language changed to Hindi': 'Language changed to Hindi',
-            'Language changed to Bengali': 'Language changed to Bengali',
-            'Scanning bill': 'Scanning bill',
-            'Error scanning bill': 'Error scanning bill',
-            'Scan complete': 'Scan complete',
-            'Showing your calculation history': 'Showing your calculation history',
-            'Your average calculation result is': 'Your average calculation result is',
-            'No numeric calculations in history yet': 'No numeric calculations in history yet',
-            'Voice recognition unavailable. Please use Chrome or Edge.': 'Voice recognition unavailable. Please use Chrome or Edge.',
-            'Microphone permission is denied. Please enable it in your browser settings.': 'Microphone permission is denied. Please enable it in your browser settings.',
-            'Error checking microphone permission. Please check your browser settings.': 'Error checking microphone permission. Please check your browser settings.',
-            'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.': 'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.'
-        },
-        'hi-IN': {
-            'Cleared': 'साफ हो गया',
-            'Plus': 'जोड़',
-            'Minus': 'घटाव',
-            'Multiply': 'गुणा',
-            'Divide': 'भाग',
-            'Number': 'नंबर',
-            'Error in calculation': 'गणना में त्रुटि',
-            'Please repeat the command clearly': 'कृपया कमांड को स्पष्ट रूप से दोहराएं',
-            'Voice control activated': 'वॉइस कंट्रोल शुरू हो गया',
-            'Voice control stopped': 'वॉइस कंट्रोल बंद हो गया',
-            'Voice error, please try again': 'वॉइस में त्रुटि, कृपया फिर से कोशिश करें',
-            'Mic failed to start, check permissions': 'माइक शुरू करने में असफल, कृपया सुनिश्चित करें कि माइक कनेक्ट है और अनुमतियाँ दी गई हैं।',
-            'No speech detected, please speak': 'कोई आवाज नहीं मिली, कृपया बोलें',
-            'Mic not found, check your device': 'माइक नहीं मिला, अपने डिवाइस की जांच करें',
-            'Mic permission denied, allow it': 'माइक अनुमति अस्वीकृत, कृपया ब्राउज़र सेटिंग्स में इसे सक्षम करें',
-            'Theme changed to light': 'थीम लाइट में बदल गई',
-            'Theme changed to dark': 'थीम डार्क में बदल गई',
-            'Theme changed to colorful': 'थीम रंगीन में बदल गई',
-            'Language changed to English': 'भाषा अंग्रेजी में बदल गई',
-            'Language changed to Hindi': 'भाषा हिंदी में बदल गई',
-            'Language changed to Bengali': 'भाषा बंगाली में बदल गई',
-            'Scanning bill': 'बिल स्कैन हो रहा है',
-            'Error scanning bill': 'बिल स्कैन करने में त्रुटि',
-            'Scan complete': 'स्कैन पूरा हुआ',
-            'Showing your calculation history': 'आपकी गणना का इतिहास दिखा रहा हूँ',
-            'Your average calculation result is': 'आपका औसत गणना परिणाम है',
-            'No numeric calculations in history yet': 'अभी तक इतिहास में कोई संख्यात्मक गणना नहीं',
-            'Voice recognition unavailable. Please use Chrome or Edge.': 'वॉइस रिकग्निशन उपलब्ध नहीं है। कृपया क्रोम या एज का उपयोग करें।',
-            'Microphone permission is denied. Please enable it in your browser settings.': 'माइक अनुमति अस्वीकृत है। कृपया अपनी ब्राउज़र सेटिंग्स में इसे सक्षम करें।',
-            'Error checking microphone permission. Please check your browser settings.': 'माइक अनुमति जाँचने में त्रुटि। कृपया अपनी ब्राउज़र सेटिंग्स जाँचें।',
-            'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.': 'माइक शुरू करने में असफल। कृपया सुनिश्चित करें कि माइक कनेक्ट है और अनुमतियाँ दी गई हैं।'
-        },
-        'bn-IN': {
-            'Cleared': 'পরিষ্কার হয়ে গেছে',
-            'Plus': 'যোগ',
-            'Minus': 'বিয়োগ',
-            'Multiply': 'গুণ',
-            'Divide': 'ভাগ',
-            'Number': 'নম্বর',
-            'Error in calculation': 'গণনায় ত্রুটি',
-            'Please repeat the command clearly': 'দয়া করে কমান্ডটি স্পষ্টভাবে পুনরাবৃত্তি করুন',
-            'Voice control activated': 'ভয়েস নিয়ন্ত্রণ চালু হয়েছে',
-            'Voice control stopped': 'ভয়েস নিয়ন্ত্রণ বন্ধ হয়েছে',
-            'Voice error, please try again': 'ভয়েসে ত্রুটি, আবার চেষ্টা করুন',
-            'Mic failed to start, check permissions': 'মাইক চালু করতে ব্যর্থ, দয়া করে নিশ্চিত করুন মাইক সংযুক্ত আছে এবং অনুমতি দেওয়া হয়েছে।',
-            'No speech detected, please speak': 'কোনো শব্দ শনাক্ত হয়নি, বলুন',
-            'Mic not found, check your device': 'মাইক পাওয়া যায়নি, আপনার ডিভাইস চেক করুন',
-            'Mic permission denied, allow it': 'মাইকের অনুমতি প্রত্যাখ্যাত, দয়া করে ব্রাউজার সেটিংসে এটি সক্ষম করুন',
-            'Theme changed to light': 'থিম লাইটে পরিবর্তন হয়েছে',
-            'Theme changed to dark': 'থিম গাঢ়ে পরিবর্তন হয়েছে',
-            'Theme changed to colorful': 'থিম রঙিনে পরিবর্তন হয়েছে',
-            'Language changed to English': 'ভাষা ইংরেজিতে পরিবর্তন হয়েছে',
-            'Language changed to Hindi': 'ভাষা হিন্দিতে পরিবর্তন হয়েছে',
-            'Language changed to Bengali': 'ভাষা বাংলায় পরিবর্তন হয়েছে',
-            'Scanning bill': 'বিল স্ক্যান হচ্ছে',
-            'Error scanning bill': 'বিল স্ক্যান করতে ত্রুটি',
-            'Scan complete': 'স্ক্যান সম্পূর্ণ',
-            'Showing your calculation history': 'আপনার গণনার ইতিহাস দেখাচ্ছি',
-            'Your average calculation result is': 'আপনার গড় গণনার ফলাফল হল',
-            'No numeric calculations in history yet': 'এখনও ইতিহাসে কোনো সংখ্যার গণনা নেই',
-            'Voice recognition unavailable. Please use Chrome or Edge.': 'ভয়েস রিকগনিশন উপলব্ধ নয়। দয়া করে ক্রোম বা এজ ব্যবহার করুন।',
-            'Microphone permission is denied. Please enable it in your browser settings.': 'মাইকের অনুমতি প্রত্যাখ্যাত। দয়া করে আপনার ব্রাউজার সেটিংসে এটি সক্ষম করুন।',
-            'Error checking microphone permission. Please check your browser settings.': 'মাইক অনুমতি পরীক্ষা করতে ত্রুটি। দয়া করে আপনার ব্রাউজার সেটিংস পরীক্ষা করুন।',
-            'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.': 'মাইক চালু করতে ব্যর্থ। দয়া করে নিশ্চিত করুন মাইক সংযুক্ত আছে এবং অনুমতি দেওয়া হয়েছে।'
-        }
-    };
-
-    const translatedText = translations[currentLang][text] || text;
-    const utterance = new SpeechSynthesisUtterance(translatedText);
-    utterance.lang = currentLang;
-    utterance.volume = 1;
-    utterance.rate = 0.9;
-    utterance.pitch = 1;
-    utterance.onstart = () => console.log('TTS started:', translatedText);
-    utterance.onend = () => console.log('TTS ended');
-    utterance.onerror = (e) => console.error('TTS error:', e.error);
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
-}
-
-function speakResult(result) {
-    const messages = {
-        'en-IN': `The result is ${result}`,
-        'hi-IN': `जवाब है ${result}`,
-        'bn-IN': `ফলাফল হল ${result}`
-    };
-    speak(messages[currentLang]);
-}
-
-// Smart Bill Scanner with File Size Optimization
+// Smart Bill Scanner
 const billInput = document.getElementById('billInput');
 const billResult = document.getElementById('billResult');
 const scanStatus = document.getElementById('scanStatus');
@@ -495,10 +487,9 @@ if (billInput && billResult && scanStatus) {
 
         img.onload = async () => {
             try {
-                // Compress image to reduce file size
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                const maxWidth = 800; // Reduce to max 800px width
+                const maxWidth = 800;
                 let width = img.width;
                 let height = img.height;
                 if (width > maxWidth) {
@@ -508,8 +499,7 @@ if (billInput && billResult && scanStatus) {
                 canvas.width = width;
                 canvas.height = height;
                 ctx.drawImage(img, 0, 0, width, height);
-                ctx.filter = 'contrast(1.5) brightness(1.1)'; // Lighter filter to reduce processing
-                const compressedImg = canvas.toDataURL('image/jpeg', 0.5); // Compress to 50% quality
+                const compressedImg = canvas.toDataURL('image/jpeg', 0.5);
 
                 const worker = await Tesseract.createWorker('eng', Tesseract.OEM.LSTM_ONLY, {
                     workerPath: 'https://unpkg.com/tesseract.js@v5.0.4/dist/worker.min.js',
@@ -519,7 +509,7 @@ if (billInput && billResult && scanStatus) {
                 await worker.setParameters({
                     tessedit_char_whitelist: '0123456789₹$.TotalAMOUNT',
                     tessedit_pageseg_mode: Tesseract.PSM.AUTO,
-                    user_defined_dpi: '200' // Reduced DPI for performance
+                    user_defined_dpi: '200'
                 });
 
                 const { data: { text } } = await worker.recognize(compressedImg);
@@ -554,15 +544,13 @@ if (billInput && billResult && scanStatus) {
                 }
 
                 await worker.terminate();
-                // Cleanup URL object to free memory
                 URL.revokeObjectURL(img.src);
             } catch (error) {
-                console.error('Detailed scan error:', error.message, error.stack);
+                console.error('Scan error:', error);
                 billResult.textContent = 'Error scanning bill';
                 scanStatus.textContent = translations[currentLang]['Error scanning bill'] || 'Error scanning bill';
                 scanStatus.classList.remove('scanning');
                 speak('Error scanning bill');
-                console.log('Check image quality, lighting, or network connection.');
             }
         };
         img.onerror = () => {

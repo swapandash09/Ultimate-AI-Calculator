@@ -1,7 +1,7 @@
 ```
 // Intro Logic
 document.addEventListener('DOMContentLoaded', () => {
-    const intro = document.getElementById('intro');
+    const intro = document.querySelector('.intro');
     const calculatorContainer = document.getElementById('calculatorContainer');
 
     if (!intro || !calculatorContainer) {
@@ -9,14 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('Forcing calculator display as fallback');
         if (calculatorContainer) {
             calculatorContainer.style.display = 'block';
-            calculatorContainer.style.opacity = '1';
+            calculatorContainer.classList.add('visible');
         }
         return;
     }
 
     console.log('Page loaded, intro visible');
     calculatorContainer.style.display = 'none';
-    calculatorContainer.style.opacity = '0'; // Ensure initial opacity for transition
 
     // Function to handle transition
     function showCalculator() {
@@ -28,8 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Use requestAnimationFrame for smooth CSS transition
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    calculatorContainer.style.transition = 'opacity 0.5s ease';
-                    calculatorContainer.style.opacity = '1';
+                    calculatorContainer.classList.add('visible');
                     console.log('Calculator now visible');
                 });
             });
@@ -38,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn('Forcing calculator display due to error');
             intro.style.display = 'none';
             calculatorContainer.style.display = 'block';
-            calculatorContainer.style.opacity = '1';
+            calculatorContainer.classList.add('visible');
         }
     }
 
@@ -47,11 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fallback: Force show calculator after 5 seconds if transition fails
     setTimeout(() => {
-        if (intro.style.display !== 'none' || calculatorContainer.style.opacity !== '1') {
+        if (!intro.classList.contains('hidden') || !calculatorContainer.classList.contains('visible')) {
             console.warn('Transition timeout: forcing calculator display');
             intro.style.display = 'none';
             calculatorContainer.style.display = 'block';
-            calculatorContainer.style.opacity = '1';
+            calculatorContainer.classList.add('visible');
         }
     }, 5000);
 });
@@ -62,7 +60,7 @@ script.src = 'https://unpkg.com/mathjs@12.4.2/lib/browser/math.js';
 document.head.appendChild(script);
 
 // Calculator Logic
-const display = document.getElementById('display');
+const display = document.querySelector('.display');
 const buttons = document.querySelectorAll('.buttons button');
 let currentInput = '0';
 let currentLang = 'en-IN';
@@ -99,7 +97,7 @@ if (!display || !buttons.length) {
                     speak('Error in calculation');
                 }
             } else {
-                if (currentInput === '0' && value !== '+' && value !== '-' && value !== '*' && value !== '/') {
+                if (currentInput === '0' && value !== '+' && value !== '-' && value !== '*' && value !== '/' && value !== '(' && value !== ')') {
                     currentInput = value;
                 } else if (/[+\-*/]$/.test(currentInput) && /[+\-*/]/.test(value)) {
                     currentInput = currentInput.slice(0, -1) + value;
@@ -129,21 +127,6 @@ if (themeCycle) {
 function applyTheme(theme) {
     document.body.className = theme;
     console.log('Theme switched to:', theme);
-    const container = document.querySelector('.calculator-container');
-    if (container) {
-        if (theme === 'dark') {
-            container.style.background = 'rgba(40, 40, 40, 0.95)';
-            container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.5)';
-        } else if (theme === 'colorful') {
-            container.style.background = 'rgba(255, 255, 255, 0.2)';
-            container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3)';
-        } else {
-            container.style.background = 'rgba(240, 240, 240, 0.95)';
-            container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.2)';
-        }
-    } else {
-        console.error('Calculator container not found for theme apply');
-    }
 }
 
 // Language Cycling
@@ -494,7 +477,7 @@ function speak(text) {
             'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.': 'माइक शुरू करने में असफल। कृपया सुनिश्चित करें कि माइक कनेक्ट है और अनुमतियाँ दी गई हैं।'
         },
         'bn-IN': {
-            'Cleared':ขน'পরিষ্কার হয়ে গেছে',
+            'Cleared': 'পরিষ্কার হয়ে গেছে',
             'Plus': 'যোগ',
             'Minus': 'বিয়োগ',
             'Multiply': 'গুণ',

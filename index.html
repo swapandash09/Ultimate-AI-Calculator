@@ -1,70 +1,66 @@
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ultimate AI Calculator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Intro Section -->
-    <div class="intro" id="intro">
-        <div class="intro-logo">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#00ffcc" stroke-width="8"/>
-                <path d="M50 20 L65 50 L50 80 L35 50 Z" fill="#ff69b4"/>
-                <circle cx="50" cy="50" r="10" fill="#fff"/>
-            </svg>
-        </div>
-        <h1 class="intro-title">Ultimate AI Calculator</h1>
-        <p class="intro-tagline">Precision Meets Intelligence</p>
+    <!-- Intro Screen -->
+    <div id="intro">
+        <h1>Welcome to Ultimate AI Calculator</h1>
+        <p>Loading your intelligent calculator...</p>
     </div>
 
-    <!-- Calculator Container -->
-    <div class="calculator-container" id="calculatorContainer" style="display: none;">
-        <div class="header">
-            <button id="voiceToggle" class="voice-btn">
-                <span class="mic-icon"></span>
-            </button>
-            <div class="display" id="display">0</div>
-            <button id="historyToggle" class="history-btn">History</button>
+    <!-- Calculator Dashboard -->
+    <div id="calculatorContainer" class="calculator-container">
+        <div class="display-container">
+            <div id="display">0</div>
+        </div>
+        <div class="buttons">
+            <button>7</button>
+            <button>8</button>
+            <button>9</button>
+            <button>/</button>
+            <button>4</button>
+            <button>5</button>
+            <button>6</button>
+            <button>*</button>
+            <button>1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>-</button>
+            <button>0</button>
+            <button>.</button>
+            <button>=</button>
+            <button>+</button>
+            <button>C</button>
         </div>
         <div class="controls">
-            <button id="theme-cycle" class="control-btn">Theme</button>
-            <button id="lang-cycle" class="control-btn">Language</button>
+            <button id="theme-cycle">Cycle Theme</button>
+            <button id="lang-cycle">Cycle Language</button>
+            <button id="voiceToggle">Voice Toggle</button>
+            <button id="historyToggle">History</button>
         </div>
         <div class="bill-scanner">
             <label for="billInput">Scan Bill:</label>
             <input type="file" id="billInput" accept="image/*" capture="environment">
-            <div id="billResult">Total: N/A</div>
-            <div id="scanStatus" class="scan-status">Ready</div>
+            <div id="scanStatus">Ready to scan</div>
+            <div id="billResult">Total: Not scanned</div>
         </div>
-        <div class="buttons">
-            <button class="number">7</button>
-            <button class="number">8</button>
-            <button class="number">9</button>
-            <button class="operator">+</button>
-            <button class="number">4</button>
-            <button class="number">5</button>
-            <button class="number">6</button>
-            <button class="operator">-</button>
-            <button class="number">1</button>
-            <button class="number">2</button>
-            <button class="number">3</button>
-            <button class="operator">*</button>
-            <button class="number">0</button>
-            <button class="clear">C</button>
-            <button class="equals">=</button>
-            <button class="operator">/</button>
-        </div>
-        <div class="footer">Powered by SD</div>
-        <div class="history-panel" id="historyPanel" style="display: none;">
+        <div id="historyPanel" style="display: none;">
             <h3>Calculation History</h3>
             <ul id="historyList"></ul>
-            <div id="historyInsights"></div>
+            <div id="historyInsights">No numeric results yet.</div>
         </div>
     </div>
+
+    <!-- Load Tesseract.js for bill scanning -->
     <script src="https://unpkg.com/tesseract.js@v5.0.4/dist/tesseract.min.js"></script>
+    <!-- Load main script -->
     <script src="script.js"></script>
 </body>
 </html>
+```

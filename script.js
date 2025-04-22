@@ -1,3 +1,4 @@
+```
 // Intro Logic
 document.addEventListener('DOMContentLoaded', () => {
     const intro = document.getElementById('intro');
@@ -9,17 +10,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     console.log('Page loaded, intro visible');
-    calculatorContainer.style.display = 'none'; // Ensure calculator is hidden initially
+    calculatorContainer.style.display = 'none';
     setTimeout(() => {
         console.log('Hiding intro, showing calculator');
         intro.classList.add('hidden');
         calculatorContainer.style.display = 'block';
         setTimeout(() => {
-            calculatorContainer.classList.add('visible'); // Fade in calculator
+            calculatorContainer.classList.add('visible');
             console.log('Calculator now visible');
-        }, 10); // Small delay for smooth transition
+        }, 10);
     }, 3000);
 });
+
+// Load math.js for safe and precise calculations
+const script = document.createElement('script');
+script.src = 'https://unpkg.com/mathjs@12.4.2/lib/browser/math.js';
+document.head.appendChild(script);
 
 // Calculator Logic
 const display = document.getElementById('display');
@@ -27,12 +33,17 @@ const buttons = document.querySelectorAll('.buttons button');
 let currentInput = '0';
 let currentLang = 'en-IN';
 let calculationHistory = [];
+let lastClickTime = 0;
 
 if (!display || !buttons.length) {
     console.error('Display or buttons not found in DOM');
 } else {
     buttons.forEach(button => {
         button.addEventListener('click', () => {
+            const now = Date.now();
+            if (now - lastClickTime < 200) return; // Debounce clicks
+            lastClickTime = now;
+
             const value = button.textContent;
             console.log('Button clicked:', value);
             if (value === 'C') {
@@ -40,7 +51,7 @@ if (!display || !buttons.length) {
                 speak('Cleared');
             } else if (value === '=') {
                 try {
-                    const result = eval(currentInput).toString();
+                    const result = math.evaluate(currentInput).toString();
                     speakResult(result);
                     calculationHistory.push({
                         date: new Date().toLocaleString(),
@@ -48,12 +59,19 @@ if (!display || !buttons.length) {
                         result: result
                     });
                     currentInput = result;
-                } catch {
+                } catch (error) {
+                    console.error('Calculation error:', error);
                     currentInput = 'Error';
                     speak('Error in calculation');
                 }
             } else {
-                currentInput = currentInput === '0' ? value : currentInput + value;
+                if (currentInput === '0' && value !== '+' && value !== '-' && value !== '*' && value !== '/') {
+                    currentInput = value;
+                } else if (/[+\-*/]$/.test(currentInput) && /[+\-*/]/.test(value)) {
+                    currentInput = currentInput.slice(0, -1) + value;
+                } else {
+                    currentInput += value;
+                }
                 speak(value);
             }
             display.textContent = currentInput;
@@ -74,7 +92,6 @@ if (themeCycle) {
     });
 }
 
-// Apply Theme Function
 function applyTheme(theme) {
     document.body.className = theme;
     console.log('Theme switched to:', theme);
@@ -83,10 +100,10 @@ function applyTheme(theme) {
         if (theme === 'dark') {
             container.style.background = 'rgba(40, 40, 40, 0.95)';
             container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.5)';
-        } else if (theme === 'colorful') {
+        } else if (theme === 'color inful') {
             container.style.background = 'rgba(255, 255, 255, 0.2)';
             container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3)';
-        } else if (theme === 'light') {
+        } else {
             container.style.background = 'rgba(240, 240, 240, 0.95)';
             container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.2)';
         }
@@ -124,7 +141,6 @@ if (historyToggle && historyPanel) {
     });
 }
 
-// Update History UI
 function updateHistoryUI() {
     const historyList = document.getElementById('historyList');
     const historyInsights = document.getElementById('historyInsights');
@@ -151,16 +167,23 @@ function updateHistoryUI() {
 // Voice Support
 const voiceToggle = document.getElementById('voiceToggle');
 let recognition;
+let recognitionAttempts = 0;
+const maxRecognitionAttempts = 3;
 
-try {
-    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = currentLang;
-} catch (error) {
-    console.error('SpeechRecognition not supported:', error);
-    alert('Your browser does not support Speech Recognition. Use Chrome.');
+function initializeRecognition() {
+    try {
+        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = currentLang;
+        console.log('SpeechRecognition initialized');
+    } catch (error) {
+        console.error('SpeechRecognition not supported:', error);
+        speak('Your browser does not support Speech Recognition. Use Chrome.');
+    }
 }
+
+initializeRecognition();
 
 let isVoiceActive = false;
 
@@ -180,7 +203,18 @@ if (voiceToggle && recognition) {
 }
 
 function startRecognition() {
-    if (!recognition) return;
+    if (!recognition) {
+        if (recognitionAttempts < maxRecognitionAttempts) {
+            recognitionAttempts++;
+            console.log(`Retrying SpeechRecognition initialization, attempt ${recognitionAttempts}`);
+            initializeRecognition();
+            setTimeout(startRecognition, 1000);
+        } else {
+            console.error('Failed to initialize SpeechRecognition after retries');
+            speak('Voice recognition unavailable');
+        }
+        return;
+    }
     try {
         recognition.start();
         isVoiceActive = true;
@@ -194,7 +228,6 @@ function startRecognition() {
     }
 }
 
-// Permission Check Function
 function checkMicPermission() {
     navigator.permissions.query({ name: 'microphone' }).then((result) => {
         if (result.state === 'denied') {
@@ -210,13 +243,11 @@ function checkMicPermission() {
     });
 }
 
-// Voice Recognition Handling
 if (recognition) {
     recognition.onresult = (event) => {
         const command = event.results[0][0].transcript.toLowerCase();
         console.log('Heard:', command);
 
-        // Language Switching
         if (command.includes('change to hindi') || command.includes('hindi mein badlo')) {
             currentLang = 'hi-IN';
             recognition.lang = currentLang;
@@ -232,10 +263,7 @@ if (recognition) {
             recognition.lang = currentLang;
             langIndex = 2;
             speak('ভাষা বাংলায় পরিবর্তন হয়েছে');
-        }
-
-        // Theme Switching with UI/UX Change
-        else if (command.includes('change theme') || command.includes('theme badlo')) {
+        } else if (command.includes('change theme') || command.includes('theme badlo')) {
             themeIndex = (themeIndex + 1) % themes.length;
             applyTheme(themes[themeIndex]);
             speak(`Theme changed to ${themes[themeIndex]}`);
@@ -248,10 +276,7 @@ if (recognition) {
         } else if (command.includes('colorful theme') || command.includes('colorful mode')) {
             applyTheme('colorful');
             speak('Theme changed to colorful');
-        }
-
-        // Current Time (Abhi to bole)
-        else if (command.includes('abhi to bole') || command.includes('current time') || command.includes('time bolo')) {
+        } else if (command.includes('current time') || command.includes('time bolo')) {
             const now = new Date();
             const timeString = now.toLocaleTimeString(currentLang === 'en-IN' ? 'en-US' : currentLang);
             currentInput = timeString;
@@ -262,17 +287,11 @@ if (recognition) {
                 'bn-IN': `বর্তমান সময় হল ${timeString}`
             };
             speak(timeMessages[currentLang]);
-        }
-
-        // Show History
-        else if (command.includes('meri history dikhao') || command.includes('show history')) {
+        } else if (command.includes('show history')) {
             historyPanel.style.display = 'block';
             updateHistoryUI();
             speak('Showing your calculation history');
-        }
-
-        // Average Calculation
-        else if (command.includes('mere calculations ka average batao') || command.includes('average of my calculations')) {
+        } else if (command.includes('average of my calculations')) {
             const totals = calculationHistory.filter(h => !isNaN(parseFloat(h.result))).map(h => parseFloat(h.result));
             if (totals.length > 0) {
                 const avg = totals.reduce((a, b) => a + b, 0) / totals.length;
@@ -280,41 +299,38 @@ if (recognition) {
             } else {
                 speak('No numeric calculations in history yet');
             }
-        }
-
-        // Mathematical Expression Matching (e.g., "5 + 10")
-        const match = command.match(/(\d+)\s*([\+\-\*\/])\s*(\d+)/);
-        if (match) {
-            let num1 = match[1];
-            let operator = match[2];
-            let num2 = match[3];
-            currentInput = `${num1}${operator}${num2}`;
-            display.textContent = currentInput;
-            console.log('Expression:', currentInput);
-            try {
-                currentInput = eval(currentInput).toString();
-                speakResult(currentInput);
-                display.textContent = currentInput;
-                console.log('Result:', currentInput);
-                calculationHistory.push({
-                    date: new Date().toLocaleString(),
-                    input: `${num1} ${operator} ${num2}`,
-                    result: currentInput
-                });
-            } catch {
-                currentInput = 'Error';
-                speak('Error in calculation');
-                display.textContent = currentInput;
-            }
-        }
-
-        // Basic Commands
-        else if (command.includes('clear') || command.includes('saaf karo')) {
+        } else if (command.includes('clear') || command.includes('saaf karo')) {
             currentInput = '0';
             speak('Cleared');
             display.textContent = currentInput;
         } else {
-            speak('Please repeat the command clearly');
+            const match = command.match(/(\d+\.?\d*)\s*([+\-*/])\s*(\d+\.?\d*)/);
+            if (match) {
+                let num1 = match[1];
+                let operator = match[2];
+                let num2 = match[3];
+                currentInput = `${num1}${operator}${num2}`;
+                display.textContent = currentInput;
+                console.log('Expression:', currentInput);
+                try {
+                    const result = math.evaluate(currentInput).toString();
+                    speakResult(result);
+                    display.textContent = result;
+                    console.log('Result:', result);
+                    calculationHistory.push({
+                        date: new Date().toLocaleString(),
+                        input: `${num1} ${operator} ${num2}`,
+                        result: result
+                    });
+                    currentInput = result;
+                } catch {
+                    currentInput = 'Error';
+                    speak('Error in calculation');
+                    display.textContent = currentInput;
+                }
+            } else {
+                speak('Please repeat the command clearly');
+            }
         }
 
         recognition.stop();
@@ -339,7 +355,6 @@ if (recognition) {
     };
 }
 
-// Text-to-Speech
 function speak(text) {
     const translations = {
         'en-IN': {
@@ -477,8 +492,8 @@ if (billInput && billResult && scanStatus) {
                 canvas.width = img.width;
                 canvas.height = img.height;
                 ctx.drawImage(img, 0, 0);
-                ctx.filter = 'contrast(1.5) grayscale(1)';
-                const enhancedImg = canvas.toDataURL('image/jpeg');
+                ctx.filter = 'contrast(2) grayscale(1) brightness(1.2)';
+                const enhancedImg = canvas.toDataURL('image/jpeg', 0.8);
 
                 const worker = await Tesseract.createWorker('eng', Tesseract.OEM.LSTM_ONLY, {
                     workerPath: 'https://unpkg.com/tesseract.js@v5.0.4/dist/worker.min.js',
@@ -487,15 +502,15 @@ if (billInput && billResult && scanStatus) {
                 });
                 await worker.setParameters({
                     tessedit_char_whitelist: '0123456789₹$.TotalAMOUNT',
-                    tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
-                    user_defined_dpi: '70'
+                    tessedit_pageseg_mode: Tesseract.PSM.AUTO,
+                    user_defined_dpi: '300'
                 });
 
                 const { data: { text } } = await worker.recognize(enhancedImg);
                 console.log('Bill text:', text);
 
-                const totalMatch = text.match(/(?:Total|TOTAL|Amount|AMOUNT|Sum|SUM)[:\s]*[₹$]?(\d+(?:\.\d{1,2})?)/i) ||
-                                  text.match(/(\d+(?:\.\d{1,2})?)(?:\s*$|\s+[^\d])/i);
+                const totalMatch = text.match(/(?:Total|TOTAL|Amount|AMOUNT|Sum|SUM|Final|Grand Total)[:\s]*[₹$]?(\d+\.?\d{0,2})/i) ||
+                                  text.match(/(\d+\.?\d{0,2})(?:\s*$|\s+[^\d])/i);
                 const total = totalMatch ? totalMatch[1] : 'Not Found';
                 billResult.textContent = `Total: ${total}`;
 
@@ -529,7 +544,7 @@ if (billInput && billResult && scanStatus) {
                 scanStatus.textContent = translations[currentLang]['Error scanning bill'] || 'Error scanning bill';
                 scanStatus.classList.remove('scanning');
                 speak('Error scanning bill');
-                console.log('Check image quality or network connection.');
+                console.log('Check image quality, lighting, or network connection.');
             }
         };
         img.onerror = () => {
@@ -543,3 +558,4 @@ if (billInput && billResult && scanStatus) {
 } else {
     console.error('Bill scanner elements not found');
 }
+```

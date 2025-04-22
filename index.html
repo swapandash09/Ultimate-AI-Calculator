@@ -9,48 +9,61 @@
 </head>
 <body>
     <!-- Intro Screen -->
-    <div id="intro">
-        <h1>Welcome to Ultimate AI Calculator</h1>
-        <p>Loading your intelligent calculator...</p>
+    <div class="intro">
+        <div class="intro-logo">
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#00ffcc" stroke-width="8"/>
+                <path d="M50 20 A30 30 0 0 1 80 50 A30 30 0 0 1 50 80 A30 30 0 0 1 20 50 A30 30 0 0 1 50 20" fill="none" stroke="#fff" stroke-width="4"/>
+            </svg>
+        </div>
+        <h1 class="intro-title">Ultimate AI Calculator</h1>
+        <p class="intro-tagline">Your Intelligent Math Companion</p>
     </div>
 
     <!-- Calculator Dashboard -->
     <div id="calculatorContainer" class="calculator-container">
-        <div class="display-container">
-            <div id="display">0</div>
+        <div class="header">
+            <div id="voiceToggle" class="voice-btn">
+                <div class="mic-icon"></div>
+            </div>
+        </div>
+        <div class="display">0</div>
+        <div class="controls">
+            <button id="theme-cycle" class="control-btn">Cycle Theme</button>
+            <button id="lang-cycle" class="control-btn">Cycle Language</button>
+            <button id="historyToggle" class="history-btn">History</button>
         </div>
         <div class="buttons">
-            <button>7</button>
-            <button>8</button>
-            <button>9</button>
-            <button>/</button>
-            <button>4</button>
-            <button>5</button>
-            <button>6</button>
-            <button>*</button>
-            <button>1</button>
-            <button>2</button>
-            <button>3</button>
-            <button>-</button>
-            <button>0</button>
-            <button>.</button>
-            <button>=</button>
-            <button>+</button>
-            <button>C</button>
-        </div>
-        <div class="controls">
-            <button id="theme-cycle">Cycle Theme</button>
-            <button id="lang-cycle">Cycle Language</button>
-            <button id="voiceToggle">Voice Toggle</button>
-            <button id="historyToggle">History</button>
+            <button class="clear">C</button>
+            <button class="operator">(</button>
+            <button class="operator">)</button>
+            <button class="operator">/</button>
+            <button class="number">7</button>
+            <button class="number">8</button>
+            <button class="number">9</button>
+            <button class="operator">*</button>
+            <button class="number">4</button>
+            <button class="number">5</button>
+            <button class="number">6</button>
+            <button class="operator">-</button>
+            <button class="number">1</button>
+            <button class="number">2</button>
+            <button class="number">3</button>
+            <button class="operator">+</button>
+            <button class="number">0</button>
+            <button class="number">.</button>
+            <button class="equals">=</button>
         </div>
         <div class="bill-scanner">
             <label for="billInput">Scan Bill:</label>
             <input type="file" id="billInput" accept="image/*" capture="environment">
-            <div id="scanStatus">Ready to scan</div>
+            <div class="scan-status" id="scanStatus">Ready to scan</div>
             <div id="billResult">Total: Not scanned</div>
         </div>
-        <div id="historyPanel" style="display: none;">
+        <div class="footer">
+            Powered by xAI
+        </div>
+        <div class="history-panel" id="historyPanel" style="display: none;">
             <h3>Calculation History</h3>
             <ul id="historyList"></ul>
             <div id="historyInsights">No numeric results yet.</div>

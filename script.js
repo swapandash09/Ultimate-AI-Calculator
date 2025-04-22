@@ -100,7 +100,7 @@ function applyTheme(theme) {
         if (theme === 'dark') {
             container.style.background = 'rgba(40, 40, 40, 0.95)';
             container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.5)';
-        } else if (theme === 'colorful') {
+        } else if (theme === 'color inful') {
             container.style.background = 'rgba(255, 255, 255, 0.2)';
             container.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3)';
         } else {
@@ -166,116 +166,80 @@ function updateHistoryUI() {
 
 // Voice Support
 const voiceToggle = document.getElementById('voiceToggle');
-let recognition = null;
+let recognition;
 let recognitionAttempts = 0;
 const maxRecognitionAttempts = 3;
-let lastVoiceToggleTime = 0;
 
 function initializeRecognition() {
-    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
-        console.error('SpeechRecognition not supported in this browser.');
-        speak('Voice recognition is not supported. Please use Chrome.');
-        voiceToggle.disabled = true;
-        voiceToggle.style.opacity = '0.5';
-        voiceToggle.style.cursor = 'not-allowed';
-        return false;
-    }
-
     try {
         recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.continuous = false;
         recognition.interimResults = false;
         recognition.lang = currentLang;
-        console.log('SpeechRecognition initialized successfully');
-        return true;
+        console.log('SpeechRecognition initialized');
     } catch (error) {
-        console.error('Failed to initialize SpeechRecognition:', error);
-        return false;
+        console.error('SpeechRecognition not supported:', error);
+        speak('Your browser does not support Speech Recognition. Use Chrome.');
     }
 }
 
-async function checkMicPermission() {
-    try {
-        const result = await navigator.permissions.query({ name: 'microphone' });
-        console.log('Microphone permission state:', result.state);
-        if (result.state === 'denied') {
-            speak('Microphone permission is denied. Please enable it in your browser settings.');
-            console.log('Go to Chrome Settings > Privacy and Security > Site Settings > Microphone to allow access.');
-            return false;
-        } else if (result.state === 'prompt') {
-            console.log('Microphone permission not yet granted. Requesting permission...');
-            return true; // Allow attempt to trigger permission prompt
-        } else if (result.state === 'granted') {
-            console.log('Microphone permission granted.');
-            return true;
-        }
-    } catch (error) {
-        console.error('Error checking microphone permission:', error);
-        speak('Error checking microphone permission. Please check your browser settings.');
-        return false;
-    }
-}
-
-async function startRecognition() {
-    if (!recognition) {
-        if (recognitionAttempts < maxRecognitionAttempts) {
-            recognitionAttempts++;
-            console.log(`Retrying SpeechRecognition initialization, attempt ${recognitionAttempts}`);
-            if (initializeRecognition()) {
-                setTimeout(startRecognition, 1000);
-            } else {
-                speak('Voice recognition unavailable. Please use Chrome.');
-            }
-            return;
-        } else {
-            console.error('Failed to initialize SpeechRecognition after retries');
-            speak('Voice recognition unavailable. Please use Chrome.');
-            voiceToggle.disabled = true;
-            voiceToggle.style.opacity = '0.5';
-            voiceToggle.style.cursor = 'not-allowed';
-            return;
-        }
-    }
-
-    const permissionGranted = await checkMicPermission();
-    if (!permissionGranted) {
-        voiceToggle.classList.remove('active');
-        isVoiceActive = false;
-        return;
-    }
-
-    try {
-        recognition.start();
-        isVoiceActive = true;
-        console.log('Microphone is ON, speak now...');
-    } catch (error) {
-        console.error('Microphone start error:', error);
-        speak('Failed to start microphone. Please ensure your microphone is connected and permissions are granted.');
-        voiceToggle.classList.remove('active');
-        isVoiceActive = false;
-    }
-}
+initializeRecognition();
 
 let isVoiceActive = false;
 
-if (voiceToggle) {
-    voiceToggle.addEventListener('click', async () => {
-        const now = Date.now();
-        if (now - lastVoiceToggleTime < 1000) return; // Debounce voice toggle
-        lastVoiceToggleTime = now;
-
+if (voiceToggle && recognition) {
+    voiceToggle.addEventListener('click', () => {
         if (!isVoiceActive) {
-            await startRecognition();
-            if (isVoiceActive) {
-                voiceToggle.classList.add('active');
-                speak('Voice control activated');
-            }
+            startRecognition();
+            voiceToggle.classList.add('active');
+            speak('Voice control activated');
         } else {
-            if (recognition) recognition.stop();
+            recognition.stop();
             voiceToggle.classList.remove('active');
             speak('Voice control stopped');
             isVoiceActive = false;
         }
+    });
+}
+
+function startRecognition() {
+    if (!recognition) {
+        if (recognitionAttempts < maxRecognitionAttempts) {
+            recognitionAttempts++;
+            console.log(`Retrying SpeechRecognition initialization, attempt ${recognitionAttempts}`);
+            initializeRecognition();
+            setTimeout(startRecognition, 1000);
+        } else {
+            console.error('Failed to initialize SpeechRecognition after retries');
+            speak('Voice recognition unavailable');
+        }
+        return;
+    }
+    try {
+        recognition.start();
+        isVoiceActive = true;
+        console.log('Mic is ON, speak now...');
+    } catch (error) {
+        console.error('Mic start error:', error);
+        speak('Mic failed to start, check permissions');
+        voiceToggle.classList.remove('active');
+        isVoiceActive = false;
+        checkMicPermission();
+    }
+}
+
+function checkMicPermission() {
+    navigator.permissions.query({ name: 'microphone' }).then((result) => {
+        if (result.state === 'denied') {
+            speak('Mic permission denied. Please allow it in browser settings.');
+            console.log('Permission denied. Go to Chrome Settings > Privacy and Security > Microphone.');
+        } else if (result.state === 'prompt') {
+            console.log('Permission not yet granted. Click mic again to request.');
+        } else if (result.state === 'granted') {
+            console.log('Permission granted, but mic still failed. Check device.');
+        }
+    }).catch((error) => {
+        console.error('Permission query error:', error);
     });
 }
 
@@ -377,12 +341,12 @@ if (recognition) {
         console.error('Voice error:', event.error);
         let errorMessage = 'Voice error, please try again';
         if (event.error === 'no-speech') errorMessage = 'No speech detected, please speak';
-        else if (event.error === 'audio-capture') errorMessage = 'Microphone not found, please check your device';
-        else if (event.error === 'not-allowed') errorMessage = 'Microphone permission denied, please enable it in browser settings';
+        else if (event.error === 'audio-capture') errorMessage = 'Mic not found, check your device';
+        else if (event.error === 'not-allowed') errorMessage = 'Mic permission denied, allow it';
         speak(errorMessage);
         voiceToggle.classList.remove('active');
         isVoiceActive = false;
-        if (event.error === 'not-allowed') checkMicPermission();
+        checkMicPermission();
     };
 
     recognition.onend = () => {
@@ -405,10 +369,10 @@ function speak(text) {
             'Voice control activated': 'Voice control activated',
             'Voice control stopped': 'Voice control stopped',
             'Voice error, please try again': 'Voice error, please try again',
-            'Mic failed to start, check permissions': 'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.',
+            'Mic failed to start, check permissions': 'Mic failed to start, check permissions',
             'No speech detected, please speak': 'No speech detected, please speak',
-            'Mic not found, check your device': 'Microphone not found, please check your device',
-            'Mic permission denied, allow it': 'Microphone permission denied, please enable it in browser settings',
+            'Mic not found, check your device': 'Mic not found, check your device',
+            'Mic permission denied, allow it': 'Mic permission denied, allow it',
             'Theme changed to light': 'Theme changed to light',
             'Theme changed to dark': 'Theme changed to dark',
             'Theme changed to colorful': 'Theme changed to colorful',
@@ -420,11 +384,7 @@ function speak(text) {
             'Scan complete': 'Scan complete',
             'Showing your calculation history': 'Showing your calculation history',
             'Your average calculation result is': 'Your average calculation result is',
-            'No numeric calculations in history yet': 'No numeric calculations in history yet',
-            'Voice recognition unavailable. Please use Chrome.': 'Voice recognition unavailable. Please use Chrome.',
-            'Microphone permission is denied. Please enable it in your browser settings.': 'Microphone permission is denied. Please enable it in your browser settings.',
-            'Error checking microphone permission. Please check your browser settings.': 'Error checking microphone permission. Please check your browser settings.',
-            'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.': 'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.'
+            'No numeric calculations in history yet': 'No numeric calculations in history yet'
         },
         'hi-IN': {
             'Cleared': 'साफ हो गया',
@@ -438,10 +398,10 @@ function speak(text) {
             'Voice control activated': 'वॉइस कंट्रोल शुरू हो गया',
             'Voice control stopped': 'वॉइस कंट्रोल बंद हो गया',
             'Voice error, please try again': 'वॉइस में त्रुटि, कृपया फिर से कोशिश करें',
-            'Mic failed to start, check permissions': 'माइक शुरू करने में असफल, कृपया सुनिश्चित करें कि माइक कनेक्ट है और अनुमतियाँ दी गई हैं।',
+            'Mic failed to start, check permissions': 'माइक शुरू करने में असफल, अनुमति जांचें',
             'No speech detected, please speak': 'कोई आवाज नहीं मिली, कृपया बोलें',
             'Mic not found, check your device': 'माइक नहीं मिला, अपने डिवाइस की जांच करें',
-            'Mic permission denied, allow it': 'माइक अनुमति अस्वीकृत, कृपया ब्राउज़र सेटिंग्स में इसे सक्षम करें',
+            'Mic permission denied, allow it': 'माइक अनुमति अस्वीकृत, इसे अनुमति दें',
             'Theme changed to light': 'थीम लाइट में बदल गई',
             'Theme changed to dark': 'थीम डार्क में बदल गई',
             'Theme changed to colorful': 'थीम रंगीन में बदल गई',
@@ -453,11 +413,7 @@ function speak(text) {
             'Scan complete': 'स्कैन पूरा हुआ',
             'Showing your calculation history': 'आपकी गणना का इतिहास दिखा रहा हूँ',
             'Your average calculation result is': 'आपका औसत गणना परिणाम है',
-            'No numeric calculations in history yet': 'अभी तक इतिहास में कोई संख्यात्मक गणना नहीं',
-            'Voice recognition unavailable. Please use Chrome.': 'वॉइस रिकग्निशन उपलब्ध नहीं है। कृपया क्रोम का उपयोग करें।',
-            'Microphone permission is denied. Please enable it in your browser settings.': 'माइक अनुमति अस्वीकृत है। कृपया अपनी ब्राउज़र सेटिंग्स में इसे सक्षम करें।',
-            'Error checking microphone permission. Please check your browser settings.': 'माइक अनुमति जाँचने में त्रुटि। कृपया अपनी ब्राउज़र सेटिंग्स जाँचें।',
-            'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.': 'माइक शुरू करने में असफल। कृपया सुनिश्चित करें कि माइक कनेक्ट है और अनुमतियाँ दी गई हैं।'
+            'No numeric calculations in history yet': 'अभी तक इतिहास में कोई संख्यात्मक गणना नहीं'
         },
         'bn-IN': {
             'Cleared': 'পরিষ্কার হয়ে গেছে',
@@ -471,10 +427,10 @@ function speak(text) {
             'Voice control activated': 'ভয়েস নিয়ন্ত্রণ চালু হয়েছে',
             'Voice control stopped': 'ভয়েস নিয়ন্ত্রণ বন্ধ হয়েছে',
             'Voice error, please try again': 'ভয়েসে ত্রুটি, আবার চেষ্টা করুন',
-            'Mic failed to start, check permissions': 'মাইক চালু করতে ব্যর্থ, দয়া করে নিশ্চিত করুন মাইক সংযুক্ত আছে এবং অনুমতি দেওয়া হয়েছে।',
+            'Mic failed to start, check permissions': 'মাইক চালু করতে ব্যর্থ, অনুমতি পরীক্ষা করুন',
             'No speech detected, please speak': 'কোনো শব্দ শনাক্ত হয়নি, বলুন',
             'Mic not found, check your device': 'মাইক পাওয়া যায়নি, আপনার ডিভাইস চেক করুন',
-            'Mic permission denied, allow it': 'মাইকের অনুমতি প্রত্যাখ্যাত, দয়া করে ব্রাউজার সেটিংসে এটি সক্ষম করুন',
+            'Mic permission denied, allow it': 'মাইকের অনুমতি প্রত্যাখ্যাত, এটি অনুমতি দিন',
             'Theme changed to light': 'থিম লাইটে পরিবর্তন হয়েছে',
             'Theme changed to dark': 'থিম গাঢ়ে পরিবর্তন হয়েছে',
             'Theme changed to colorful': 'থিম রঙিনে পরিবর্তন হয়েছে',
@@ -486,11 +442,7 @@ function speak(text) {
             'Scan complete': 'স্ক্যান সম্পূর্ণ',
             'Showing your calculation history': 'আপনার গণনার ইতিহাস দেখাচ্ছি',
             'Your average calculation result is': 'আপনার গড় গণনার ফলাফল হল',
-            'No numeric calculations in history yet': 'এখনও ইতিহাসে কোনো সংখ্যার গণনা নেই',
-            'Voice recognition unavailable. Please use Chrome.': 'ভয়েস রিকগনিশন উপলব্ধ নয়। দয়া করে ক্রোম ব্যবহার করুন।',
-            'Microphone permission is denied. Please enable it in your browser settings.': 'মাইকের অনুমতি প্রত্যাখ্যাত। দয়া করে আপনার ব্রাউজার সেটিংসে এটি সক্ষম করুন।',
-            'Error checking microphone permission. Please check your browser settings.': 'মাইক অনুমতি পরীক্ষা করতে ত্রুটি। দয়া করে আপনার ব্রাউজার সেটিংস পরীক্ষা করুন।',
-            'Failed to start microphone. Please ensure your microphone is connected and permissions are granted.': 'মাইক চালু করতে ব্যর্থ। দয়া করে নিশ্চিত করুন মাইক সংযুক্ত আছে এবং অনুমতি দেওয়া হয়েছে।'
+            'No numeric calculations in history yet': 'এখনও ইতিহাসে কোনো সংখ্যার গণনা নেই'
         }
     };
 

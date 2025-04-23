@@ -1,0 +1,214 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Body and Theme Styles */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    transition: all 0.3s ease;
+}
+
+/* Light Theme */
+body.light {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: #333;
+}
+
+/* Dark Theme */
+body.dark {
+    background: linear-gradient(135deg, #1e1e2f 0%, #2a2a40 100%);
+    color: #e0e0e0;
+}
+
+/* Colorful Theme */
+body.colorful {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+    color: #333;
+}
+
+/* Calculator Container */
+.calculator {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Display */
+.display {
+    width: 100%;
+    height: 80px;
+    background: rgba(0, 0, 0, 0.3);
+    color: inherit;
+    font-size: 2rem;
+    text-align: right;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: none;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Buttons Grid */
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+button {
+    padding: 20px;
+    font-size: 1.5rem;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    color: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+button:active {
+    background: rgba(255, 255, 255, 0.4);
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Theme and Language Controls */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+#theme-cycle, #lang-cycle, #voiceToggle {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: inherit;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#theme-cycle:hover, #lang-cycle:hover, #voiceToggle:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+#voiceToggle.active {
+    background: #4caf50;
+    color: #fff;
+}
+
+/* History Panel */
+#historyPanel {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#historyPanel h3 {
+    margin-bottom: 10px;
+}
+
+#historyList {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+#historyList li {
+    margin: 5px 0;
+    font-size: 0.9rem;
+}
+
+#historyInsights {
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+/* Bill Scanner */
+.bill-scanner {
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+#billInput {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.2);
+    color: inherit;
+}
+
+#billResult, #scanStatus {
+    margin-top: 10px;
+    font-size: 1rem;
+}
+
+#scanStatus.scanning {
+    color: #ff9800;
+}
+
+#scanStatus.complete {
+    color: #4caf50;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .calculator {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .display {
+        font-size: 1.5rem;
+        height: 60px;
+        padding: 15px;
+    }
+
+    button {
+        padding: 15px;
+        font-size: 1.2rem;
+    }
+
+    #theme-cycle, #lang-cycle, #voiceToggle {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+
+    #historyPanel {
+        width: 90%;
+        right: 5%;
+        top: 10px;
+    }
+}

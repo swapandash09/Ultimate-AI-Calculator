@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Calculator — Voice, Bill Scan & History</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="light">
+
+  <div class="calculator">
+    <div class="sd-logo" title="SD">SD</div>
+
+    <div class="controls">
+      <button id="theme-cycle" title="Change theme"><span class="icon">🎨</span><span data-i18n="theme">Theme</span></button>
+      <button id="history-toggle" title="Show history"><span class="icon">🕘</span><span data-i18n="history">History</span></button>
+      <button id="lang-cycle" title="Change language"><span class="icon">🌐</span><span id="langLabel">EN</span></button>
+      <button id="voiceToggle" title="Toggle voice answers"><span class="icon">🔊</span><span data-i18n="voice">Voice</span></button>
+    </div>
+
+    <div class="display-wrap">
+      <span id="memoryBadge" class="memory-badge">M</span>
+      <div id="exprLine" class="expr-line">0</div>
+      <input type="text" id="display" class="display" value="0" readonly>
+    </div>
+
+    <div class="quick-actions">
+      <button id="voiceInputBtn" title="Speak a calculation"><span class="icon">🎙️</span><span data-i18n="speakCalc">Speak</span></button>
+      <button id="undoBtn" title="Undo last action"><span class="icon">↩️</span><span data-i18n="undo">Undo</span></button>
+    </div>
+
+    <div class="buttons">
+      <button data-action="mc" class="mem-btn">MC</button>
+      <button data-action="mr" class="mem-btn">MR</button>
+      <button data-action="m-plus" class="mem-btn">M+</button>
+      <button data-action="m-minus" class="mem-btn">M−</button>
+
+      <button data-action="clear">AC</button>
+      <button data-action="delete">⌫</button>
+      <button data-action="percent">%</button>
+      <button data-op="÷">÷</button>
+
+      <button data-num="7" class="num-btn">7</button>
+      <button data-num="8" class="num-btn">8</button>
+      <button data-num="9" class="num-btn">9</button>
+      <button data-op="×">×</button>
+
+      <button data-num="4" class="num-btn">4</button>
+      <button data-num="5" class="num-btn">5</button>
+      <button data-num="6" class="num-btn">6</button>
+      <button data-op="−">−</button>
+
+      <button data-num="1" class="num-btn">1</button>
+      <button data-num="2" class="num-btn">2</button>
+      <button data-num="3" class="num-btn">3</button>
+      <button data-op="+">+</button>
+
+      <button data-num="0" class="span-two num-btn">0</button>
+      <button data-num="." class="num-btn">.</button>
+      <button data-action="equals" class="equals">=</button>
+    </div>
+
+    <!-- Bill Scanner -->
+    <div class="bill-scanner">
+      <h3 data-i18n="billScannerTitle">📷 Bill Scanner</h3>
+      <input type="file" id="billInput" accept="image/*" capture="environment">
+      <img id="billPreview" class="bill-preview" alt="Uploaded bill preview">
+      <button id="scanBillBtn"><span class="icon">📷</span><span data-i18n="scanBtn">Scan Bill</span></button>
+      <button id="speakAmountBtn" class="secondary-btn"><span class="icon">🎤</span><span data-i18n="speakAmountBtn">Speak Amount (Handwritten Bill)</span></button>
+      <p class="hint" data-i18n="speakAmountHint">Bill is handwritten or blurry? Skip the scan and just say the total out loud.</p>
+      <div id="scanStatus"></div>
+      <div id="billResult"></div>
+    </div>
+
+  </div>
+
+  <!-- History Panel -->
+  <div id="historyPanel">
+    <h3 data-i18n="historyTitle">🕘 History</h3>
+    <ul id="historyList"></ul>
+    <div id="historyInsights"></div>
+    <button id="clearHistoryBtn" data-i18n="clearHistory">Clear History</button>
+  </div>
+
+  <!-- Smart Notifications -->
+  <div id="toastContainer"></div>
+
+  <!-- Tesseract.js for real OCR-based bill scanning -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

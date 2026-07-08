@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Calculator — Voice, Bill Scan & History</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="light">
+
+  <div class="calculator">
+
+    <div class="controls">
+      <button id="theme-cycle" title="Change theme"><span class="icon">🎨</span><span data-i18n="theme">Theme</span></button>
+      <button id="history-toggle" title="Show history"><span class="icon">🕘</span><span data-i18n="history">History</span></button>
+      <button id="lang-cycle" title="Change language"><span class="icon">🌐</span><span id="langLabel">EN</span></button>
+      <button id="voiceToggle" title="Toggle voice answers"><span class="icon">🔊</span><span data-i18n="voice">Voice</span></button>
+    </div>
+
+    <div class="mode-selector" id="modeSelector">
+      <button class="mode-chip active" data-mode="standard"><span class="icon">🔢</span><span data-i18n="modeStandard">Standard</span></button>
+      <button class="mode-chip" data-mode="emi"><span class="icon">🏦</span><span data-i18n="modeEmi">EMI</span></button>
+      <button class="mode-chip" data-mode="gst"><span class="icon">🧾</span><span data-i18n="modeGst">GST</span></button>
+      <button class="mode-chip" data-mode="discount"><span class="icon">🏷️</span><span data-i18n="modeDiscount">Discount</span></button>
+      <button class="mode-chip" data-mode="interest"><span class="icon">📈</span><span data-i18n="modeInterest">Interest</span></button>
+      <button class="mode-chip" data-mode="split"><span class="icon">🍽️</span><span data-i18n="modeSplit">Split Bill</span></button>
+      <button class="mode-chip" data-mode="billmaker"><span class="icon">🛒</span><span data-i18n="modeBillMaker">Bill Maker</span></button>
+    </div>
+
+    <div id="standardMode" class="mode-panel active">
+    <div class="display-wrap">
+      <span id="memoryBadge" class="memory-badge">M</span>
+      <div id="exprLine" class="expr-line">0</div>
+      <input type="text" id="display" class="display" value="0" readonly>
+    </div>
+
+    <div class="quick-actions">
+      <button id="voiceInputBtn" title="Speak a calculation"><span class="icon">🎙️</span><span data-i18n="speakCalc">Speak</span></button>
+      <button id="undoBtn" title="Undo last action"><span class="icon">↩️</span><span data-i18n="undo">Undo</span></button>
+    </div>
+
+    <div class="buttons">
+      <button data-action="mc" class="mem-btn">MC</button>
+      <button data-action="mr" class="mem-btn">MR</button>
+      <button data-action="m-plus" class="mem-btn">M+</button>
+      <button data-action="m-minus" class="mem-btn">M−</button>
+
+      <button data-action="clear">AC</button>
+      <button data-action="delete">⌫</button>
+      <button data-action="percent">%</button>
+      <button data-op="÷">÷</button>
+
+      <button data-num="7" class="num-btn">7</button>
+      <button data-num="8" class="num-btn">8</button>
+      <button data-num="9" class="num-btn">9</button>
+      <button data-op="×">×</button>
+
+      <button data-num="4" class="num-btn">4</button>
+      <button data-num="5" class="num-btn">5</button>
+      <button data-num="6" class="num-btn">6</button>
+      <button data-op="−">−</button>
+
+      <button data-num="1" class="num-btn">1</button>
+      <button data-num="2" class="num-btn">2</button>
+      <button data-num="3" class="num-btn">3</button>
+      <button data-op="+">+</button>
+
+      <button data-num="0" class="span-two num-btn">0</button>
+      <button data-num="." class="num-btn">.</button>
+      <button data-action="equals" class="equals">=</button>
+    </div>
+    </div>
+
+    <!-- EMI / Loan Calculator -->
+    <div id="emiMode" class="mode-panel finance-panel mode-emi">
+      <h3><span class="icon">🏦</span> <span data-i18n="modeEmi">EMI</span> <span class="ai-tag">🤖 AI</span></h3>
+      <label data-i18n="principalLabel">Loan Amount (₹)</label>
+      <input type="number" id="emiPrincipal" inputmode="decimal" placeholder="500000">
+      <label data-i18n="rateLabel">Interest Rate (% per year)</label>
+      <input type="number" id="emiRate" inputmode="decimal" placeholder="9.5">
+      <label data-i18n="tenureLabel">Tenure (months)</label>
+      <input type="number" id="emiTenure" inputmode="numeric" placeholder="60">
+      <button class="calc-btn" id="emiCalcBtn" data-i18n="calculate">Calculate</button>
+      <div class="finance-result" id="emiResult"></div>
+      <div class="ai-insight" id="emiInsight"></div>
+    </div>
+
+    <!-- GST Calculator -->
+    <div id="gstMode" class="mode-panel finance-panel mode-gst">
+      <h3><span class="icon">🧾</span> <span data-i18n="modeGst">GST</span> <span class="ai-tag">🤖 AI</span></h3>
+      <label data-i18n="amountLabel">Amount (₹)</label>
+      <input type="number" id="gstAmount" inputmode="decimal" placeholder="1000">
+      <label data-i18n="gstRateLabel">GST Rate</label>
+      <select id="gstRate">
+        <option value="5">5%</option>
+        <option value="12">12%</option>
+        <option value="18" selected>18%</option>
+        <option value="28">28%</option>
+      </select>
+      <div class="toggle-row">
+        <button class="toggle-btn active" id="gstAddBtn" data-i18n="addGstLabel">Add GST</button>
+        <button class="toggle-btn" id="gstRemoveBtn" data-i18n="removeGstLabel">Remove GST</button>
+      </div>
+      <button class="calc-btn" id="gstCalcBtn" data-i18n="calculate">Calculate</button>
+      <div class="finance-result" id="gstResult"></div>
+      <div class="ai-insight" id="gstInsight"></div>
+    </div>
+
+    <!-- Discount Calculator -->
+    <div id="discountMode" class="mode-panel finance-panel mode-discount">
+      <h3><span class="icon">🏷️</span> <span data-i18n="modeDiscount">Discount</span> <span class="ai-tag">🤖 AI</span></h3>
+      <label data-i18n="amountLabel">Original Price (₹)</label>
+      <input type="number" id="discPrice" inputmode="decimal" placeholder="2000">
+      <label data-i18n="discountLabel">Discount (%)</label>
+      <input type="number" id="discPercent" inputmode="decimal" placeholder="25">
+      <button class="calc-btn" id="discCalcBtn" data-i18n="calculate">Calculate</button>
+      <div class="finance-result" id="discResult"></div>
+      <div class="ai-insight" id="discInsight"></div>
+    </div>
+
+    <!-- Simple / Compound Interest Calculator -->
+    <div id="interestMode" class="mode-panel finance-panel mode-interest">
+      <h3><span class="icon">📈</span> <span data-i18n="modeInterest">Interest</span> <span class="ai-tag">🤖 AI</span></h3>
+      <label data-i18n="principalLabel">Loan Amount (₹)</label>
+      <input type="number" id="siPrincipal" inputmode="decimal" placeholder="100000">
+      <label data-i18n="rateLabel">Interest Rate (% per year)</label>
+      <input type="number" id="siRate" inputmode="decimal" placeholder="8">
+      <label data-i18n="timeLabel">Time (years)</label>
+      <input type="number" id="siTime" inputmode="decimal" placeholder="3">
+      <div class="toggle-row">
+        <button class="toggle-btn active" id="siSimpleBtn" data-i18n="simpleLabel">Simple</button>
+        <button class="toggle-btn" id="siCompoundBtn" data-i18n="compoundLabel">Compound</button>
+      </div>
+      <button class="calc-btn" id="siCalcBtn" data-i18n="calculate">Calculate</button>
+      <div class="finance-result" id="siResult"></div>
+      <div class="ai-insight" id="siInsight"></div>
+    </div>
+
+    <!-- Split Bill Calculator -->
+    <div id="splitMode" class="mode-panel finance-panel mode-split">
+      <h3><span class="icon">🍽️</span> <span data-i18n="modeSplit">Split Bill</span> <span class="ai-tag">🤖 AI</span></h3>
+      <label data-i18n="amountLabel">Total Bill (₹)</label>
+      <input type="number" id="splitAmount" inputmode="decimal" placeholder="1200">
+      <label data-i18n="peopleLabel">Number of People</label>
+      <input type="number" id="splitPeople" inputmode="numeric" placeholder="4">
+      <label data-i18n="tipLabel">Tip (%)</label>
+      <input type="number" id="splitTip" inputmode="decimal" placeholder="10">
+      <button class="calc-btn" id="splitCalcBtn" data-i18n="calculate">Calculate</button>
+      <div class="finance-result" id="splitResult"></div>
+      <div class="ai-insight" id="splitInsight"></div>
+    </div>
+
+    <!-- Bill Maker: build a shop bill item-by-item, then export as PDF/JPG -->
+    <div id="billmakerMode" class="mode-panel finance-panel mode-billmaker">
+      <h3><span class="icon">🛒</span> <span data-i18n="modeBillMaker">Bill Maker</span></h3>
+
+      <!-- Shop profile — saved locally in this browser only, never sent anywhere -->
+      <button type="button" id="bmShopToggle" class="bm-section-toggle">
+        <span data-i18n="shopDetailsLabel">🏪 Shop Details</span>
+        <span class="bm-toggle-arrow">▾</span>
+      </button>
+      <div id="bmShopPanel" class="bm-collapsible">
+        <p class="hint" data-i18n="shopDetailsHint">Saved only in this browser — never uploaded anywhere.</p>
+        <input type="text" id="bmShopName" data-i18n-ph="shopNamePh" placeholder="Shop Name">
+        <input type="text" id="bmShopAddress" data-i18n-ph="shopAddressPh" placeholder="Shop Address">
+        <div class="bm-two-col">
+          <input type="text" id="bmShopPan" placeholder="PAN">
+          <input type="text" id="bmShopGst" placeholder="GSTIN">
+        </div>
+        <input type="tel" id="bmShopMobile" data-i18n-ph="shopMobilePh" placeholder="Mobile Number">
+      </div>
+
+      <div class="bm-invoice-row">
+        <span data-i18n="invoiceNoLabel">Invoice No.</span>
+        <strong id="bmInvoiceNo">INV-0001</strong>
+      </div>
+
+      <div class="bm-divider"></div>
+
+      <label data-i18n="customerNameLabel">Customer Name</label>
+      <input type="text" id="bmCustomerName" placeholder="Ramesh Kumar">
+      <label data-i18n="customerPhoneLabel">Phone Number</label>
+      <input type="tel" id="bmCustomerPhone" placeholder="98765 43210">
+      <label data-i18n="customerAddressLabel">Address</label>
+      <input type="text" id="bmCustomerAddress" placeholder="Main Bazaar, Siliguri">
+
+      <div class="bm-divider"></div>
+
+      <!-- Item catalog: save an item once with its rate, then just search & tap -->
+      <button type="button" id="bmCatalogToggle" class="bm-section-toggle">
+        <span data-i18n="manageItemsLabel">📦 Manage Saved Items</span>
+        <span class="bm-toggle-arrow">▾</span>
+      </button>
+      <div id="bmCatalogPanel" class="bm-collapsible">
+        <div class="bm-catalog-entry">
+          <input type="text" id="bmCatName" data-i18n-ph="catNamePh" placeholder="Item name">
+          <input type="number" id="bmCatRate" inputmode="decimal" placeholder="₹ rate">
+          <select id="bmCatUnit">
+            <option value="kg">Kg</option>
+            <option value="g">Gram</option>
+            <option value="pcs">PCS</option>
+          </select>
+          <button id="bmCatAddBtn" class="calc-btn bm-add-btn">+</button>
+        </div>
+        <ul id="bmCatalogList" class="bm-item-list"></ul>
+      </div>
+
+      <label data-i18n="itemNameLabel">Item</label>
+      <input type="text" id="bmItemName" list="bmCatalogDatalist" data-i18n-ph="searchItemPh" placeholder="Search saved item or type new...">
+      <datalist id="bmCatalogDatalist"></datalist>
+
+      <div class="toggle-row">
+        <button class="toggle-btn active" id="bmUnitKg" data-unit="kg">Kg</button>
+        <button class="toggle-btn" id="bmUnitG" data-unit="g">Gram</button>
+        <button class="toggle-btn" id="bmUnitPcs" data-unit="pcs">PCS</button>
+      </div>
+
+      <div class="bm-item-entry bm-item-entry-3">
+        <input type="number" id="bmItemQty" inputmode="decimal" placeholder="1" value="1">
+        <input type="number" id="bmItemPrice" inputmode="decimal" placeholder="₹ rate">
+        <button id="bmAddItemBtn" class="calc-btn bm-add-btn">+</button>
+      </div>
+      <div class="bm-live-amount" id="bmLiveAmount"></div>
+
+      <ul id="bmItemList" class="bm-item-list"></ul>
+      <div class="finance-result" id="bmTotal"></div>
+
+      <div class="bm-actions">
+        <button id="bmGeneratePdfBtn" class="calc-btn"><span class="icon">📄</span> <span data-i18n="pdfBtn">PDF</span></button>
+        <button id="bmGenerateJpgBtn" class="calc-btn bm-jpg-btn"><span class="icon">🖼️</span> <span data-i18n="jpgBtn">JPG</span></button>
+        <button id="bmClearBtn" class="icon-only-btn" title="Clear bill">🗑️</button>
+      </div>
+    </div>
+
+    <!-- Bill Scanner -->
+    <div class="bill-scanner" id="billScannerSection">
+      <h3 data-i18n="billScannerTitle">📷 Bill Scanner</h3>
+      <input type="file" id="billInput" accept="image/*" capture="environment">
+      <img id="billPreview" class="bill-preview" alt="Uploaded bill preview">
+      <div class="bill-btn-row">
+        <button id="scanBillBtn"><span class="icon">📷</span><span data-i18n="scanBtn">Scan Bill</span></button>
+        <button id="resetBillBtn" class="icon-only-btn" title="Reset scanner">🗑️</button>
+      </div>
+      <button id="speakAmountBtn" class="secondary-btn"><span class="icon">🎤</span><span data-i18n="speakAmountBtn">Speak Amount (Handwritten Bill)</span></button>
+      <p class="hint" data-i18n="speakAmountHint">Bill is handwritten or blurry? Skip the scan and just say the total out loud.</p>
+      <div id="scanStatus"></div>
+      <div id="billResult"></div>
+    </div>
+
+    <div class="dev-credit">
+      <span class="dev-badge">SD</span>
+      <span class="dev-text">Developed by <strong>Swapan</strong></span>
+    </div>
+
+  </div>
+
+  <!-- History Panel -->
+  <div id="historyPanel">
+    <div class="history-header">
+      <h3 data-i18n="historyTitle">🕘 History</h3>
+      <button id="historyCloseBtn" class="history-close" title="Close">✕ <span data-i18n="back">Back</span></button>
+    </div>
+    <ul id="historyList"></ul>
+    <div id="historyInsights"></div>
+    <button id="clearHistoryBtn" data-i18n="clearHistory">Clear History</button>
+  </div>
+
+  <!-- Smart Notifications -->
+  <div id="toastContainer"></div>
+
+  <!-- Tesseract.js loads on demand (only when Scan Bill is used) so the app itself starts fast -->
+  <script src="script.js" defer></script>
+</body>
+</html>

@@ -89994,6 +89994,66 @@ body.dark #emiMode .ed-wr u.g, body.neon #emiMode .ed-wr u.g { color: #4ade80; }
 @media (max-width:360px){.mode-gpstracker .gps-hm{grid-template-columns:minmax(0,1fr) 96px}.mode-gpstracker .gps-odo .d{width:25px;height:40px;font-size:26px}.mode-gpstracker .gps-dial{width:96px}}
 
 
+/* === tracker UI v3 === */
+.mode-gpstracker .gps-hero{position:relative;overflow:hidden;isolation:isolate}
+.mode-gpstracker .gps-aur{position:absolute;inset:-35%;z-index:0;pointer-events:none;background:radial-gradient(38% 38% at 28% 30%,var(--ga,rgba(16,185,129,.38)),transparent 70%),radial-gradient(34% 34% at 78% 72%,var(--gb,rgba(56,189,248,.28)),transparent 70%);animation:gpsAur 10s ease-in-out infinite alternate}
+.mode-gpstracker .gps-hero>*:not(.gps-aur){position:relative;z-index:1}
+@keyframes gpsAur{from{transform:translate(-4%,-3%) rotate(0)}to{transform:translate(5%,4%) rotate(14deg)}}
+.mode-gpstracker .gps-hero[data-s="0"]{--ga:rgba(56,189,248,.35);--gb:rgba(16,185,129,.2)}
+.mode-gpstracker .gps-hero[data-s="1"]{--ga:rgba(16,185,129,.5);--gb:rgba(56,189,248,.35)}
+.mode-gpstracker .gps-hero[data-s="2"]{--ga:rgba(132,204,22,.45);--gb:rgba(245,158,11,.4)}
+.mode-gpstracker .gps-hero[data-s="3"]{--ga:rgba(248,113,113,.55);--gb:rgba(245,158,11,.45);box-shadow:0 0 0 2px rgba(248,113,113,.55),0 0 34px rgba(248,113,113,.35)}
+.mode-gpstracker .gps-spark{height:44px;margin:-2px 0 10px;border-radius:12px;background:rgba(255,255,255,.06);overflow:hidden}
+.mode-gpstracker .gps-spark svg{width:100%;height:100%;display:block}
+.mode-gpstracker .gps-veh button{border-radius:20px;transition:transform .15s,box-shadow .2s,background .2s}
+.mode-gpstracker .gps-veh button svg{width:30px;height:30px;transition:transform .2s}
+.mode-gpstracker .gps-veh button.on{background:linear-gradient(160deg,color-mix(in srgb,var(--c) 20%,var(--gc)),var(--gc));box-shadow:0 8px 22px color-mix(in srgb,var(--c) 38%,transparent)}
+.mode-gpstracker .gps-veh button.on svg{transform:scale(1.18)}
+.mode-gpstracker .gps-veh button:active{transform:scale(.95)}
+.mode-gpstracker .gps-go{position:relative;height:64px;font-size:1.05rem;letter-spacing:.02em;background:linear-gradient(135deg,#10b981,#047857);box-shadow:0 12px 28px rgba(5,150,105,.45)}
+.mode-gpstracker .gps-go svg{width:36px;height:36px;box-sizing:border-box;padding:8px;border-radius:50%;background:rgba(255,255,255,.22)}
+.mode-gpstracker .gps-go[data-a="start"]:after{content:"";position:absolute;inset:-4px;border-radius:inherit;border:2px solid rgba(16,185,129,.55);animation:gpsRing 2s ease-out infinite;pointer-events:none}
+@keyframes gpsRing{0%{transform:scale(.97);opacity:.9}100%{transform:scale(1.06);opacity:0}}
+.mode-gpstracker .gps-pa{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;box-shadow:0 10px 24px rgba(217,119,6,.35)}
+.mode-gpstracker .gps-st{background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;box-shadow:0 10px 24px rgba(185,28,28,.35)}
+.mode-gpstracker .gps-tile{position:relative;overflow:hidden;padding-left:18px}
+.mode-gpstracker .gps-tile:before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;border-radius:0 4px 4px 0;background:var(--tc,var(--g))}
+.mode-gpstracker .gps-tile:after{content:var(--ti);position:absolute;right:12px;top:10px;font-size:1.15rem}
+.mode-gpstracker .gps-tile:nth-child(1){--tc:#10b981;--ti:"🏁"}
+.mode-gpstracker .gps-tile:nth-child(2){--tc:#f59e0b;--ti:"⚡"}
+.mode-gpstracker .gps-tile:nth-child(3){--tc:#38bdf8;--ti:"⏱️"}
+.mode-gpstracker .gps-tile:nth-child(4){--tc:#f97316;--ti:"⛽"}
+.mode-gpstracker .gps-tile:nth-child(5){--tc:#8b5cf6;--ti:"🎯"}
+.mode-gpstracker .gps-tile:nth-child(6){--tc:#14b8a6;--ti:"🧭"}
+.mode-gpstracker .gps-tile b{font-size:1.45rem}
+.mode-gpstracker button[data-a="tab"]{transition:background .2s,color .2s,box-shadow .2s}
+.mode-gpstracker button[data-a="tab"].on{background:linear-gradient(135deg,#10b981,#047857)!important;color:#fff!important;box-shadow:0 8px 18px rgba(4,120,87,.35)}
+#gpsMini{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translate(-50%,24px);opacity:0;pointer-events:none;z-index:900;display:flex;align-items:baseline;gap:6px;white-space:nowrap;background:rgba(11,31,26,.93);color:#fff;border-radius:999px;padding:11px 18px;box-shadow:0 10px 28px rgba(0,0,0,.4);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);font-family:"JetBrains Mono",ui-monospace,monospace;transition:opacity .25s,transform .25s}
+#gpsMini.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#gpsMini b{font-size:1.05rem;font-weight:800}
+#gpsMini small{font-size:.65rem;opacity:.7}
+#gpsMini i{width:1px;height:14px;background:rgba(255,255,255,.25);align-self:center;margin:0 4px}
+#gpsMini u{width:8px;height:8px;border-radius:50%;background:#ef4444;align-self:center;margin-right:4px;animation:gpsMe 1.4s infinite}
+/* === nav card === */.mode-gpstracker .gps-sb input{border:0!important;box-shadow:none!important;outline:0!important;background:transparent!important;border-radius:0!important;-webkit-appearance:none;appearance:none}
+.mode-gpstracker .gps-sb input::-webkit-search-cancel-button{display:none}
+.mode-gpstracker .gps-turn{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#0f3d2e,#0b1f1a);color:#fff;border-radius:22px;padding:12px 14px;margin:10px 0;box-shadow:0 10px 26px rgba(0,0,0,.28)}
+.mode-gpstracker .gps-tg{width:58px;height:58px;flex:none;border-radius:18px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800}
+.mode-gpstracker .gps-tx{flex:1;min-width:0}
+.mode-gpstracker .gps-tx b{display:block;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:1.3rem;font-weight:800}
+.mode-gpstracker .gps-tx span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.84rem;opacity:.88;line-height:1.3}
+.mode-gpstracker .gps-vg{width:44px;height:44px;flex:none;border:0;border-radius:50%;background:rgba(255,255,255,.14);font-size:1.2rem;color:#fff}
+.mode-gpstracker .gps-vg.on{background:var(--g)}
+/* === tiles clean === */.mode-gpstracker .gps-hud{display:none!important}
+.mode-gpstracker .gps-grid{gap:10px}
+.mode-gpstracker .gps-tile{padding:12px 14px;min-height:88px;display:flex;flex-direction:column;justify-content:space-between}
+.mode-gpstracker .gps-tile:before{display:none}
+.mode-gpstracker .gps-tile:after{content:none}
+.mode-gpstracker .gps-tile small{display:flex;align-items:center;gap:7px;font-size:.74rem;font-weight:800;opacity:.75}
+.mode-gpstracker .gps-tile small:before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background:var(--tc,var(--g))}
+.mode-gpstracker .gps-tile b{font-size:1.4rem;line-height:1.15;white-space:normal;overflow-wrap:anywhere}
+.mode-gpstracker .gps-tile b i{font-size:.72rem;font-style:normal;font-weight:700;opacity:.65;margin-left:3px}
+.mode-gpstracker .gps-tile:nth-child(5) b{font-size:1.25rem}
+.mode-gpstracker .gps-tile:nth-child(6) b{font-size:1.02rem;line-height:1.25}
 /* === map HD === */.mode-gpstracker .gps-lp{position:absolute;right:58px;top:8px;z-index:900;background:var(--gc);border-radius:18px;padding:6px;box-shadow:0 8px 26px rgba(0,0,0,.32);display:none;grid-template-columns:1fr 1fr;gap:5px;min-width:210px}
 .mode-gpstracker .gps-lp.on{display:grid}
 .mode-gpstracker .gps-lp button{border:0;background:var(--gs);color:inherit;border-radius:13px;padding:11px 8px;font-weight:800;font-size:.76rem;display:flex;align-items:center;gap:6px;white-space:nowrap}
@@ -90381,6 +90441,13 @@ function gmUrl(segs, veh, dest, from) {
  var u2 = "https://www.google.com/maps/dir/?api=1&origin=" + pt(all[0]) + "&destination=" + pt(all[all.length - 1]) + "&travelmode=" + V[veh].gm; if (wp.length) u2 += "&waypoints=" + encodeURIComponent(wp.join("|")); return u2;
 }
 function openUrl(u) { if (u) window.open(u, "_blank", "noopener"); }
+function navSheet(la, lo, nm) {
+ S.navT = { la: la, lo: lo, n: nm || "" };
+ var row = function (k, ic, n, sub) { return '<button class="gps-rc" data-a="navgo" data-v="' + k + '"><span class="gps-ri">' + ic + '</span><span class="gps-rm"><b>' + n + "</b><small>" + sub + "</small></span></button>"; };
+ openSheet("<h4>" + IC.nav + esc(t("gm")) + '</h4><p class="gps-away">' + esc(nm || (la.toFixed(5) + ", " + lo.toFixed(5))) + "</p>" +
+  row("app", "📍", "Google Maps app", "Best: opens turn-by-turn navigation in the Maps app") + row("web", "🌐", "Google Maps website", "Opens the route in your browser") + row("osm", "🗺️", "OpenStreetMap route", "Works in any browser, no account or key needed") +
+  '<div class="gps-ctl"><button class="gps-btn gps-ghost" data-a="close">' + esc(t("close")) + "</button></div>", "nav");
+}
 
 /* ---------- skeleton ---------- */
 function dial() {
@@ -90405,18 +90472,18 @@ function build() {
  showTab();
 }
 function showTab() {
- var p = $("gpsP"); killDm(); killPm(); if (S.map) { try { S.map.remove(); } catch (e) {} } S.map = null; S.line = null; S.me = null; S.ring = null; S.dmk = null; S.rline = null; S.fitKey = ""; S.lc = null; S.sm = null; S.tl = null; S.rlc = null;
+ var p = $("gpsP"); killDm(); killPm(); if (S.map) { try { S.map.remove(); } catch (e) {} } S.map = null; S.line = null; S.me = null; S.ring = null; S.dmk = null; S.rline = null; S.fitKey = ""; S.lc = null; S.sm = null; S.tl = null; S.rlc = null; S.rc1 = null; S.rc2 = null;
  if (S.tab === "track") {
-  p.innerHTML = '<div class="gps-hero" id="gpsHero"><div class="gps-hh"><span class="gps-pill" id="gpsPill"></span><span class="gps-acc"><span class="gps-bars" id="gpsBars"><i></i><i></i><i></i><i></i></span><b id="gpsAccT"></b></span><button class="gps-ic" data-a="settings" aria-label="' + esc(t("settings")) + '">' + IC.gear + "</button></div>" +
-   '<div class="gps-gw">' + dial() + '<div class="gps-pk">' + esc(t("max")) + ' <b id="gpsPk">0 km/h</b></div></div><div class="gps-st3"><div><small>' + esc(t("dist")) + '</small><div class="gps-odo" id="gpsOdo" role="img"></div></div><div><small>' + esc(t("time")) + '</small><b class="gps-tm" id="gpsTime">00:00:00</b></div><div><small>' + esc(t("hdg")) + '</small><b id="gpsHdg">—</b></div></div></div>' +
-   '<div class="gps-veh" id="gpsVeh"></div><div id="gpsDest"></div><div class="gps-ctl" id="gpsCtl"></div><div class="gps-sub"><button class="gps-chip" id="gpsLock" data-a="wake" style="display:none"></button><span class="gps-net" id="gpsNet"></span></div>' +
+  p.innerHTML = '<div class="gps-hero" id="gpsHero" data-s="i"><div class="gps-aur"></div><div class="gps-hh"><span class="gps-pill" id="gpsPill"></span><span class="gps-acc"><span class="gps-bars" id="gpsBars"><i></i><i></i><i></i><i></i></span><b id="gpsAccT"></b></span><button class="gps-ic" data-a="settings" aria-label="' + esc(t("settings")) + '">' + IC.gear + "</button></div>" +
+   '<div class="gps-gw">' + dial() + '<div class="gps-pk">' + esc(t("max")) + ' <b id="gpsPk">0 km/h</b></div></div><div class="gps-spark" id="gpsSpark"></div><div class="gps-st3"><div><small>' + esc(t("dist")) + '</small><div class="gps-odo" id="gpsOdo" role="img"></div></div><div><small>' + esc(t("time")) + '</small><b class="gps-tm" id="gpsTime">00:00:00</b></div><div><small>' + esc(t("hdg")) + '</small><b id="gpsHdg">—</b></div></div></div>' +
+   '<div class="gps-turn" id="gpsTurn" style="display:none"></div><div class="gps-veh" id="gpsVeh"></div><div id="gpsDest"></div><div class="gps-ctl" id="gpsCtl"></div><div class="gps-sub"><button class="gps-chip" id="gpsLock" data-a="wake" style="display:none"></button><span class="gps-net" id="gpsNet"></span></div>' +
    '<div class="gps-grid"><div class="gps-tile"><small>' + esc(t("avg")) + '</small><b id="gpsAvg">0<i>' + esc(t("kmh")) + '</i></b></div><div class="gps-tile"><small>' + esc(t("max")) + '</small><b id="gpsMax">0<i>' + esc(t("kmh")) + '</i></b></div><div class="gps-tile"><small>' + esc(t("moving")) + '</small><b id="gpsMv">00:00:00</b></div><div class="gps-tile"><small id="gpsFl">' + esc(t("fuel")) + '</small><b id="gpsFv">—</b></div>' +
    '<div class="gps-tile"><small>' + esc(t("conf")) + '</small><b id="gpsCf">—</b></div><div class="gps-tile"><small>' + esc(t("calibT")) + '</small><b id="gpsCa">—</b></div></div>' +
    '<div class="gps-mapwrap" id="gpsMw"><div id="gpsMap"></div><div class="gps-hud" id="gpsHud"></div><div class="gps-mbtns"><button id="gpsFol" data-a="follow" class="on" title="' + esc(t("follow")) + '" aria-label="' + esc(t("follow")) + '">' + IC.nav + '</button><button data-a="fit" title="' + esc(t("fit")) + '" aria-label="' + esc(t("fit")) + '">' + IC.flag + '</button><button data-a="mloc" title="' + esc(t("locT")) + '" aria-label="' + esc(t("locT")) + '">' + IC.target + '</button><button data-a="mlay" title="' + esc(t("layT")) + '" aria-label="' + esc(t("layT")) + '">' + IC.layers + '</button><button data-a="mfull" title="' + esc(t("fullT")) + '" aria-label="' + esc(t("fullT")) + '">' + IC.full + '</button><button data-a="gm" title="' + esc(t("gm")) + '" aria-label="' + esc(t("gm")) + '">' + IC.pin + '</button></div><div class="gps-lp" id="gpsLp"></div></div><p class="gps-note">' + esc(t("keepOn")) + "</p>";
   drawVeh(); drawDest(); drawCtl(); destCalc(); paintAll(); setTimeout(mapInit, 30);
   if (ST.dest && S.st === "idle" && (!S.route || !S.cur)) ensureDest();
  } else if (S.tab === "fuel") fuelTab(); else if (S.tab === "hist") histTab(); else repTab();
- paintResume();
+ watchHero(); paintMini(); idleWatch(); paintResume();
 }
 function drawVeh() { var e = $("gpsVeh"); if (!e) return; e.innerHTML = ["walk", "bike", "car"].map(function (k) { return '<button data-a="veh" data-v="' + k + '" style="--c:' + V[k].c + '" class="' + (S.veh === k ? "on" : "") + '"' + (S.st !== "idle" ? " disabled" : "") + ">" + IC[k] + esc(t(k)) + "</button>"; }).join(""); host.style.setProperty("--vc", V[S.veh].c); }
 function drawCtl() {
@@ -90447,6 +90514,68 @@ function paintOdo(m) {
  h += '<i class="dot"></i><span class="d dc' + (pk0 && pk0[ip.length + 1] !== s[1][0] ? " tk" : "") + '">' + s[1][0] + '</span><span class="d dc' + (pk0 && pk0[ip.length + 2] !== s[1][1] ? " tk" : "") + '">' + s[1][1] + '</span><u>km</u>';
  o.innerHTML = h; o.setAttribute("aria-label", t("dist") + " " + (m / 1000).toFixed(2) + " km");
 }
+function stopIdle() { if (S.iw != null) { try { navigator.geolocation.clearWatch(S.iw); } catch (e) {} S.iw = null; } }
+function idleWatch() {
+ if (!navigator.geolocation) return; var ok = ST.dest && S.st === "idle" && S.tab === "track" && host.offsetParent !== null; if (!ok) { stopIdle(); return; } if (S.iw != null) return;
+ S.iw = navigator.geolocation.watchPosition(function (pos) {
+  if (!ST.dest || S.st !== "idle" || S.tab !== "track" || host.offsetParent === null) { stopIdle(); return; }
+  var c = pos.coords; S.cur = [c.latitude, c.longitude]; S.curAt = Date.now(); E.acc = c.accuracy; ST.lastPos = S.cur; destCalc(); moveMe(); paintAll();
+  if (Date.now() - (S.iwT || 0) > 8000) { S.iwT = Date.now(); ensureDest(); mapSync(); }
+ }, function () {}, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
+}
+var TG = { left: "↰", right: "↱", "slight left": "↖", "slight right": "↗", "sharp left": "↙", "sharp right": "↘", straight: "↑", uturn: "↶" };
+var DE = { left: "turn left", right: "turn right", "slight left": "bear left", "slight right": "bear right", "sharp left": "turn sharp left", "sharp right": "turn sharp right", straight: "continue straight", uturn: "make a U-turn" };
+var DH = { left: "बाएँ मुड़ें", right: "दाएँ मुड़ें", "slight left": "हल्का बाएँ लें", "slight right": "हल्का दाएँ लें", "sharp left": "तेज़ बाएँ मुड़ें", "sharp right": "तेज़ दाएँ मुड़ें", straight: "सीधे चलते रहें", uturn: "यू-टर्न लें" };
+function dsay(m) { var hi = lg() === "hi"; if (m >= 950) return (m / 1000).toFixed(1).replace(/\.0$/, "") + (hi ? " किलोमीटर" : " kilometres"); var r = m < 100 ? Math.max(10, Math.round(m / 10) * 10) : Math.round(m / 50) * 50; return r + (hi ? " मीटर" : " metres"); }
+function instr(st) {
+ var hi = lg() === "hi", mod = st.mod || "", nm = st.name ? String(st.name) : "";
+ if (st.ty === "arrive") return hi ? "आप अपनी मंज़िल पर पहुँच जाएँगे" : "you will reach your destination";
+ if (st.ty === "roundabout" || st.ty === "rotary" || st.ty === "roundabout turn") return hi ? "चौराहे" + (st.ex ? " से " + st.ex + " नंबर निकास लें" : " पर घूमें") : "enter the roundabout" + (st.ex ? " and take exit " + st.ex : "");
+ if (st.ty === "exit roundabout") return hi ? "चौराहे से बाहर निकलें" : "exit the roundabout";
+ var d = hi ? (DH[mod] || "आगे बढ़ें") : (DE[mod] || "continue");
+ if (st.ty === "fork") d = hi ? (mod.indexOf("left") >= 0 ? "बाएँ रास्ता लें" : "दाएँ रास्ता लें") : "keep " + (mod.indexOf("left") >= 0 ? "left" : "right") + " at the fork";
+ return hi ? (nm ? nm + " पर " : "") + d : d + (nm ? " onto " + nm : "");
+}
+function speakNow(tx) { try { if (!window.speechSynthesis) return; var u = new SpeechSynthesisUtterance(tx); u.lang = loc(); u.rate = 1; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); } catch (e) {} }
+function speak(tx) { if (ST.vg === false) return; speakNow(tx); }
+function guide() {
+ var R = S.route; if (!R || !R.ok || !R.steps || S.st !== "run" || S.arrived) { S.nx = null; return; }
+ var c = curPos(), rn = c ? routeNear(c) : null; if (!rn || rn.off > 250) return;
+ var i = S.gi || 0; while (i < R.steps.length && R.steps[i].al <= rn.along + 15) i++; S.gi = i; var st = R.steps[i]; if (!st) { S.nx = null; return; }
+ var rem = Math.max(0, st.al - rn.along); S.nx = { st: st, rem: rem, i: i };
+ var an = S.ann[i] || (S.ann[i] = {}), hi = lg() === "hi", lv = rem <= 40 ? 2 : rem <= 160 ? 1 : rem <= 420 ? 0 : -1;
+ if (lv >= 0 && !an[lv]) { an[lv] = 1; for (var kk = 0; kk < lv; kk++) an[kk] = 1; speak(lv === 2 ? (hi ? "अब, " : "Now, ") + instr(st) : (hi ? dsay(rem) + " बाद, " : "In " + dsay(rem) + ", ") + instr(st)); try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) {} }
+}
+function speakAns() {
+ var hi = lg() === "hi", l = S.res, tx; if (!Array.isArray(l)) return;
+ if (!l.length) tx = hi ? "कोई जगह नहीं मिली" : "I could not find that place";
+ else { var r = l[0], dd = r.d != null ? dsay(r.d) : ""; tx = hi ? l.length + " जगहें मिलीं। पहली जगह " + r.n + (dd ? ", " + dd + " दूर" : "") + "। मंज़िल बनाने के लिए उस पर टैप करें।" : "I found " + l.length + " places. The first is " + r.n + (dd ? ", " + dd + " away" : "") + ". Tap it to set your destination."; }
+ speakNow(tx);
+}
+function paintTurn() {
+ var e = $("gpsTurn"); if (!e) return; var R = S.route, vg = ST.vg !== false;
+ if (!ST.dest || !R || !R.ok) { e.style.display = "none"; return; } e.style.display = "";
+ var sp = '<button class="gps-vg' + (vg ? " on" : "") + '" data-a="vgtoggle" aria-label="Voice guidance">' + (vg ? "🔊" : "🔇") + "</button>";
+ if (S.st === "run" && S.nx && !S.arrived) { var st = S.nx.st, tx = instr(st); e.innerHTML = '<div class="gps-tg">' + (st.ty === "arrive" ? "🏁" : (TG[st.mod] || "↑")) + '</div><div class="gps-tx"><b>' + esc(fdt(S.nx.rem)) + "</b><span>" + esc(tx.charAt(0).toUpperCase() + tx.slice(1)) + "</span></div>" + sp; }
+ else { var rm = S.di ? Math.max(S.di.rem, 0) : R.len, mi = Math.max(1, Math.round((R.len > 0 ? Math.min(1, rm / R.len) : 1) * R.du / 60)); e.innerHTML = '<div class="gps-tg">🧭</div><div class="gps-tx"><b>' + esc(fdt(rm)) + " · " + mi + " min</b><span>📍 " + (lg() === "hi" ? "लाइव लोकेशन" : "Live location") + " → " + esc(ST.dest.n) + "</span></div>" + sp; }
+}
+function sparkSvg() {
+ var h = S.spH || [], n = h.length, mx = Math.max(V[S.veh].max * 0.5, Math.max.apply(null, h.concat([1])));
+ if (n < 2) return '<svg viewBox="0 0 300 44" preserveAspectRatio="none"><path d="M0 40H300" stroke="rgba(255,255,255,.2)" stroke-dasharray="4 7" fill="none"/></svg>';
+ var ln = "M" + h.map(function (v, i) { return (i / (n - 1) * 300).toFixed(1) + " " + (41 - Math.min(1, v / mx) * 34).toFixed(1); }).join("L");
+ return '<svg viewBox="0 0 300 44" preserveAspectRatio="none"><defs><linearGradient id="gpsSgd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34d399" stop-opacity=".5"/><stop offset="1" stop-color="#34d399" stop-opacity="0"/></linearGradient></defs><path d="' + ln + 'L300 44L0 44Z" fill="url(#gpsSgd)"/><path d="' + ln + '" fill="none" stroke="#34d399" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>';
+}
+function watchHero() {
+ if (S.io) { try { S.io.disconnect(); } catch (e) {} S.io = null; } S.heroVis = true; var h = $("gpsHero"); if (!h || !window.IntersectionObserver) return;
+ S.io = new IntersectionObserver(function (en) { S.heroVis = en[0].isIntersecting; paintMini(); }, { threshold: 0.05 }); S.io.observe(h);
+}
+function paintMini() {
+ var m = document.getElementById("gpsMini");
+ if (!m) { m = document.createElement("div"); m.id = "gpsMini"; m.addEventListener("click", function () { var h = $("gpsHero"); if (h) h.scrollIntoView({ behavior: "smooth", block: "start" }); }); document.body.appendChild(m); }
+ var on = S.st === "run" && S.tab === "track" && !S.heroVis && host.offsetParent !== null; m.className = on ? "on" : ""; if (!on) return;
+ var o = $("gpsOdo"), dk = o ? parseFloat(o.getAttribute("data-k")) || 0 : 0, sp = S.lsp || 0, tm = $("gpsTime");
+ m.innerHTML = "<u></u><b>" + (sp < 10 ? sp.toFixed(1) : Math.round(sp)) + "</b><small>km/h</small><i></i><b>" + dk.toFixed(2) + "</b><small>km</small><i></i><b>" + (tm ? tm.textContent : "") + "</b>";
+}
 function paintMeter(f, sp) {
  var g = $("gpsSeg"), i, k;
  if (g) { var ps = g.children, n = ps.length, lit = f > 0.01 ? Math.round(f * (n - 1)) + 1 : 0, pi = E.max > 1 ? Math.min(n - 1, Math.round(Math.min(1, E.max / V[S.veh].max) * (n - 1))) : -1;
@@ -90454,6 +90583,9 @@ function paintMeter(f, sp) {
  for (k = 0; k < 5; k++) { var l = $("gpsL" + k); if (l) l.textContent = Math.round(V[S.veh].max * k / 4); }
  var hd = $("gpsHdg"); if (hd) hd.textContent = S.hd == null ? "—" : cardinal(S.hd) + " · " + Math.round(S.hd) + "°";
  var pk = $("gpsPk"); if (pk) pk.textContent = E.max.toFixed(1) + " km/h";
+ S.lsp = sp; var hr = $("gpsHero"); if (hr) hr.setAttribute("data-s", S.st !== "run" ? "i" : f < .04 ? "0" : f < .55 ? "1" : f < .85 ? "2" : "3");
+ var nw = Date.now(); if (S.st === "run" && (!S.spT || nw - S.spT >= 1000)) { S.spT = nw; (S.spH = S.spH || []).push(sp); if (S.spH.length > 90) S.spH.shift(); }
+ var sk = $("gpsSpark"); if (sk) sk.innerHTML = sparkSvg(); paintMini(); paintTurn();
  var hu = $("gpsHud"); if (hu) hu.innerHTML = "<b>" + (sp < 10 ? sp.toFixed(1) : Math.round(sp)) + "</b><small>" + esc(t("kmh")) + (S.hd == null ? "" : " · " + cardinal(S.hd)) + "</small>";
 }
 function paintAll() {
@@ -90502,32 +90634,34 @@ function fetchRoute(from) {
  var prof = V[S.veh].rt, hosts = prof === "foot" ? ["https://routing.openstreetmap.de/routed-foot"] : ["https://routing.openstreetmap.de/routed-car", "https://router.project-osrm.org"], key = D.la + "," + D.lo, veh = S.veh;
  function one(i) {
   if (i >= hosts.length) { S.rbusy = 0; S.rfail++; if (!S.route) S.route = null; drawDest(); return; }
-  var url = hosts[i] + "/route/v1/driving/" + from[1].toFixed(6) + "," + from[0].toFixed(6) + ";" + D.lo.toFixed(6) + "," + D.la.toFixed(6) + "?overview=full&geometries=geojson&alternatives=false&steps=false";
+  var url = hosts[i] + "/route/v1/driving/" + from[1].toFixed(6) + "," + from[0].toFixed(6) + ";" + D.lo.toFixed(6) + "," + D.la.toFixed(6) + "?overview=full&geometries=geojson&alternatives=false&steps=true";
   var ctl = typeof AbortController === "function" ? new AbortController() : null, to = setTimeout(function () { if (ctl) ctl.abort(); }, 12000);
   fetch(url, ctl ? { signal: ctl.signal } : {}).then(function (r) { return r.json(); }).then(function (j) {
    clearTimeout(to); var r0 = j && j.routes && j.routes[0]; if (!r0 || !r0.geometry || !r0.geometry.coordinates || r0.geometry.coordinates.length < 2) throw new Error("noroute");
    if (!ST.dest || key !== ST.dest.la + "," + ST.dest.lo || veh !== S.veh) { S.rbusy = 0; return; }
    var co = r0.geometry.coordinates, step = co.length > 3000 ? Math.ceil(co.length / 3000) : 1, pts = [], q; for (q = 0; q < co.length; q += step) pts.push([co[q][1], co[q][0]]); pts.push([co[co.length - 1][1], co[co.length - 1][0]]);
    var cum = [0], j2; for (j2 = 1; j2 < pts.length; j2++) cum.push(cum[j2 - 1] + hav(pts[j2 - 1], pts[j2]));
-   S.route = { pts: pts, cum: cum, len: Math.max(r0.distance || 0, cum[cum.length - 1]), du: r0.duration || 0, ok: true, key: key }; if (!S.rd0) S.rd0 = S.route.len; S.rbusy = 0; S.rfail = 0; S.fitKey = "";
-   destCalc(); drawDest(); mapSync(); paintAll();
+   var stp = []; ((r0.legs && r0.legs[0] && r0.legs[0].steps) || []).forEach(function (sx) { var m = sx.maneuver || {}, ty = m.type; if (!m.location || ty === "depart" || ty === "new name" || ty === "continue" || ty === "notification") return; var la = m.location[1], lo = m.location[0], bi = 0, bd = 1e12, q2; for (q2 = 0; q2 < pts.length; q2++) { var dq = Math.abs(pts[q2][0] - la) + Math.abs(pts[q2][1] - lo); if (dq < bd) { bd = dq; bi = q2; } } stp.push({ la: la, lo: lo, ty: ty, mod: m.modifier || "", name: sx.name || sx.ref || "", al: cum[bi], ex: m.exit }); });
+   S.gi = 0; S.ann = {}; S.route = { pts: pts, cum: cum, len: Math.max(r0.distance || 0, cum[cum.length - 1]), du: r0.duration || 0, ok: true, key: key, steps: stp }; if (!S.rd0) S.rd0 = S.route.len; S.rbusy = 0; S.rfail = 0; S.fitKey = "";
+   destCalc(); drawDest(); mapSync(); paintAll(); if (S.spoke !== key) { S.spoke = key; var hi0 = lg() === "hi", mn = Math.max(1, Math.round(S.route.du / 60)); speak(hi0 ? "रूट तैयार है। " + dsay(S.route.len) + ", लगभग " + mn + " मिनट।" : "Route ready. " + dsay(S.route.len) + ", about " + mn + " minutes."); }
   }).catch(function () { clearTimeout(to); one(i + 1); });
  }
  one(0); drawDest();
 }
 function ensureDest() {
- if (!ST.dest) return; var c = S.cur || ST.lastPos;
- if (S.st === "idle" && !S.cur && navigator.geolocation) { locate(); return; }
- if (c && (!S.route || S.route.key !== ST.dest.la + "," + ST.dest.lo) && !S.rbusy && S.rfail < 3) fetchRoute(c);
+ if (!ST.dest) return; var fresh = S.cur && Date.now() - (S.curAt || 0) < 120000, kn = ST.dest.la + "," + ST.dest.lo;
+ if (S.st === "idle" && !fresh && navigator.geolocation) { locate(); return; }
+ var c = S.cur; if (S.st === "idle" && S.route && S.route.key === kn && S.rFrom && c && hav(S.rFrom, c) > 80) S.route = null;
+ if (c && (!S.route || S.route.key !== kn) && !S.rbusy && S.rfail < 3) fetchRoute(c); idleWatch();
 }
 var locBusy = 0;
 function locate() {
  if (!navigator.geolocation || locBusy) return; locBusy = 1; drawDest();
- navigator.geolocation.getCurrentPosition(function (pos) { locBusy = 0; var c = pos.coords; S.cur = [c.latitude, c.longitude]; E.acc = c.accuracy; ST.lastPos = S.cur; saveSt(); destCalc(); S.rfail = 0; ensureDest(); drawDest(); mapSync(); paintAll(); },
+ navigator.geolocation.getCurrentPosition(function (pos) { locBusy = 0; var c = pos.coords; S.cur = [c.latitude, c.longitude]; E.acc = c.accuracy; S.curAt = Date.now(); ST.lastPos = S.cur; saveSt(); destCalc(); S.rfail = 0; ensureDest(); drawDest(); mapSync(); paintAll(); },
   function (e) { locBusy = 0; if (e && e.code === 1) toast(t("denied"), "error"); drawDest(); }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 20000 });
 }
 function destFix() {
- if (!ST.dest) return; var di = destCalc(); if (!di) return;
+ if (!ST.dest) return; var di = destCalc(); if (!di) return; guide();
  if (S.route && S.route.ok && S.st === "run") {
   if (di.off > Math.max(120, (E.acc || 0) * 2)) S.offN++; else S.offN = 0;
   if (S.offN >= 4 && !S.rbusy && Date.now() - S.rAt > 25000 && navigator.onLine) { S.offN = 0; S.route.ok = false; fetchRoute(curPos()); }
@@ -90587,7 +90721,7 @@ function mapInit() {
  if (!m.offsetWidth) return;
  var c = S.cur || ST.lastPos || ptOf(ST.dest) || [20.5937, 78.9629];
  S.map = L.map(m, { zoomControl: false, zoomSnap: 0.5, zoomDelta: 0.5, maxZoom: 20, preferCanvas: true }).setView(c, (S.cur || ST.lastPos || ST.dest) ? 16 : 5);
- S.map.attributionControl.setPrefix(false); setTiles(); L.control.scale({ imperial: false, position: "bottomleft" }).addTo(S.map);
+ S.map.attributionControl.setPrefix(false); setTiles();
  S.lc = L.polyline(S.ll, { color: "#fff", weight: 9, opacity: .85 }).addTo(S.map); S.line = L.polyline(S.ll, { color: V[S.veh].c, weight: 5, opacity: .95 }).addTo(S.map);
  S.map.on("dragstart", function () { S.follow = false; var f = $("gpsFol"); if (f) f.className = ""; });
  mapSync(); autoLoc();
@@ -90611,17 +90745,18 @@ var TL = {
 if (!ST.mlv2) { ST.ml = "map"; ST.mlv2 = 1; saveSt(); }
 function mkTiles() {
  var k = TL[ST.ml] ? ST.ml : "map", d = TL[k], g = L.layerGroup();
- d[0].forEach(function (u, i) { g.addLayer(L.tileLayer(u, { maxZoom: 20, maxNativeZoom: d[2], detectRetina: !!d[4], attribution: i ? "" : d[1], zIndex: i + 1, subdomains: "abcd", keepBuffer: 4, updateWhenIdle: false })); });
+ d[0].forEach(function (u, i) { var tl = L.tileLayer(u, { maxZoom: 20, maxNativeZoom: d[2], detectRetina: !!d[4], attribution: i ? "" : d[1], zIndex: i + 1, subdomains: "abcd", keepBuffer: 4, updateWhenIdle: false }); if (i === 0) tl.on("tileerror", tileErr).on("tileload", function () { S.tOk = 1; }); g.addLayer(tl); });
  return g;
 }
-function setTiles() { if (!S.map) return; if (S.tl) S.map.removeLayer(S.tl); S.tl = mkTiles().addTo(S.map); S.map.getContainer().style.background = ST.ml === "dark" ? "#0b1220" : "#e9ebee"; }
+function tileErr() { S.te = (S.te || 0) + 1; if (S.te === 8 && !S.tOk && ST.ml !== "osm") { ST.ml = "osm"; saveSt(); setTiles(); toast("Map switched to Classic (HD map was not loading)", "info"); } }
+function setTiles() { if (!S.map) return; S.te = 0; S.tOk = 0; if (S.tl) S.map.removeLayer(S.tl); S.tl = mkTiles().addTo(S.map); S.map.getContainer().style.background = ST.ml === "dark" ? "#0b1220" : "#e9ebee"; }
 function paintMe() {
  var e = S.me && S.me.getElement && S.me.getElement(); if (e) { e.style.setProperty("--c", "#4285f4"); var i = e.querySelector(".gps-me-in"); if (i) { i.className = "gps-me-in" + (S.hd == null ? "" : " hd"); i.style.setProperty("--r", (S.hd || 0) + "deg"); } }
  if (!S.sm && S.map) { var f0 = null; S.ll.some(function (sg) { if (sg.length) { f0 = sg[0]; return true; } return false; }); if (f0) S.sm = L.circleMarker(f0, { radius: 7, color: "#fff", weight: 3, fillColor: "#16a34a", fillOpacity: 1 }).addTo(S.map); }
 }
 function autoLoc(force) {
  if (!navigator.geolocation || S.alBusy || (S.cur && !force)) return; S.alBusy = 1;
- navigator.geolocation.getCurrentPosition(function (pos) { S.alBusy = 0; var c = pos.coords; S.cur = [c.latitude, c.longitude]; E.acc = c.accuracy; ST.lastPos = S.cur; saveSt(); if (S.map) { S.map.setView(S.cur, 16); moveMe(); } paintAll(); },
+ navigator.geolocation.getCurrentPosition(function (pos) { S.alBusy = 0; var c = pos.coords; S.cur = [c.latitude, c.longitude]; E.acc = c.accuracy; S.curAt = Date.now(); ST.lastPos = S.cur; saveSt(); if (S.map) { S.map.setView(S.cur, 16); moveMe(); } paintAll(); },
   function (e) { S.alBusy = 0; if (e && e.code === 1) toast(t("denied"), "error"); }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 });
 }
 function fitAll() {
@@ -90632,6 +90767,9 @@ function mapSync() {
  if (!S.map) return; moveMe();
  if (ST.dest) { var dp = [ST.dest.la, ST.dest.lo]; if (!S.dmk) S.dmk = L.marker(dp, { icon: flagIcon(), keyboard: false }).addTo(S.map); else S.dmk.setLatLng(dp); } else if (S.dmk) { S.map.removeLayer(S.dmk); S.dmk = null; }
  if (ST.dest && S.route && S.route.ok) { if (!S.rline) { S.rlc = L.polyline(S.route.pts, { color: "#fff", weight: 11, opacity: .95, lineCap: "round", lineJoin: "round" }).addTo(S.map); S.rline = L.polyline(S.route.pts, { color: "#4285f4", weight: 7, opacity: .95, lineCap: "round", lineJoin: "round" }).addTo(S.map); if (S.lc) S.lc.bringToFront(); if (S.line) S.line.bringToFront(); } else { S.rline.setLatLngs(S.route.pts); if (S.rlc) S.rlc.setLatLngs(S.route.pts); } } else if (S.rline) { S.map.removeLayer(S.rline); if (S.rlc) S.map.removeLayer(S.rlc); S.rline = null; S.rlc = null; }
+ if (S.rline && S.route && S.route.ok && S.cur) { var rp0 = S.route.pts[0], rpe = S.route.pts[S.route.pts.length - 1], rdd = ST.dest ? [ST.dest.la, ST.dest.lo] : rpe, cs = { color: "#4285f4", weight: 4, opacity: .9, dashArray: "1 9", lineCap: "round" };
+  if (!S.rc1) { S.rc1 = L.polyline([S.cur, rp0], cs).addTo(S.map); S.rc2 = L.polyline([rpe, rdd], cs).addTo(S.map); } else { S.rc1.setLatLngs([S.cur, rp0]); S.rc2.setLatLngs([rpe, rdd]); }
+ } else { if (S.rc1) { S.map.removeLayer(S.rc1); S.rc1 = null; } if (S.rc2) { S.map.removeLayer(S.rc2); S.rc2 = null; } }
  var fk = ST.dest ? ST.dest.la + "," + ST.dest.lo + "|" + (S.route && S.route.ok ? (S.route.len | 0) : "") : "";
  if (ST.dest && S.fitKey !== fk && S.st !== "run" && (curPos() || S.route)) { S.fitKey = fk; S.follow = false; var f = $("gpsFol"); if (f) f.className = ""; fitAll(); }
 }
@@ -90642,7 +90780,7 @@ function killPm() { if (S.pm) { try { S.pm.remove(); } catch (e) {} } S.pm = nul
 function onFix(pos) {
  var c = pos.coords, fx = { lat: c.latitude, lng: c.longitude, acc: c.accuracy, speed: c.speed, heading: c.heading, ts: pos.timestamp || Date.now() }, g0 = E.gaps, r = E.onFix(fx);
  if (typeof c.heading === "number" && isFinite(c.heading) && (c.speed || 0) > 0.8) S.hd = c.heading;
- if (isFinite(fx.lat) && isFinite(fx.lng)) { S.cur = E.cur || [fx.lat, fx.lng]; ST.lastPos = [fx.lat, fx.lng]; }
+ if (isFinite(fx.lat) && isFinite(fx.lng)) { S.cur = E.cur || [fx.lat, fx.lng]; S.curAt = Date.now(); ST.lastPos = [fx.lat, fx.lng]; }
  if (r.pt && S.segs.length) { S.segs[S.segs.length - 1].push(r.pt); S.ll[S.ll.length - 1].push([r.pt[0], r.pt[1]]); }
  if (E.gaps > g0 && Date.now() - S.gapShown > 20000) { S.gapShown = Date.now(); toast(t("gapMsg"), "info"); }
  if (ST.dest) { if (S.st === "run") destFix(); else destCalc(); if (S.st === "idle") ensureDest(); }
@@ -90776,7 +90914,7 @@ function runSearch(q, cat) {
   var list = mergeRes(a, b);
   if (c) list.forEach(function (r) { r.d = hav(c, [r.la, r.lo]); r.b = bearing(c, [r.la, r.lo]); });
   if (cat && c) list = list.filter(function (r) { return r.d < 30000; });
-  S.resBusy = 0; S.resRaw = list; if (z[0] == null && z[1] == null) S.res = t("needNet"); else applySort(); paintRes();
+  S.resBusy = 0; S.resRaw = list; if (z[0] == null && z[1] == null) S.res = t("needNet"); else applySort(); paintRes(); if (S.viaMic) { S.viaMic = 0; speakAns(); }
  });
 }
 function dsearch() {
@@ -90786,7 +90924,7 @@ function dsearch() {
 function dmic(b) {
  var SR = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SR) { toast(t("noVoice"), "info"); return; }
  try { var r = new SR(); r.lang = loc(); r.interimResults = false; r.maxAlternatives = 1; b.classList.add("on");
-  r.onresult = function (e) { var tx = e.results[0][0].transcript, i = $("gpsQ"); if (i) { i.value = tx; var x = $("gpsQx"); if (x) x.style.display = ""; } runSearch(tx); };
+  r.onresult = function (e) { S.viaMic = 1; var tx = e.results[0][0].transcript, i = $("gpsQ"); if (i) { i.value = tx; var x = $("gpsQx"); if (x) x.style.display = ""; } runSearch(tx); };
   r.onerror = r.onend = function () { b.classList.remove("on"); }; r.start(); } catch (e) { b.classList.remove("on"); }
 }
 function rcRow(a, i, ic, n, sub, d, dir) {
@@ -90801,7 +90939,7 @@ function resHtml() {
  return head + S.res.map(function (r, i) { return rcRow("dres", i, r.ic || "📍", r.tt || r.n, r.full, r.d != null ? fdt(r.d) : "", r.b != null ? cardinal(r.b) : ""); }).join("");
 }
 function paintRes() { var e = $("gpsRes"); if (e && S.sheet === "dest") { e.innerHTML = resHtml(); var h = $("gpsHome"); if (h) h.style.display = (S.res == null && !S.resBusy) ? "" : "none"; } }
-function openDest() { S.res = null; S.resBusy = 0; S.pend = null; if (!S.sort) S.sort = "best"; sheetDest(); if (!curPos() && navigator.geolocation && S.st === "idle") locate(); }
+function openDest() { S.res = null; S.resBusy = 0; S.pend = null; if (!S.sort) S.sort = "best"; sheetDest(); if (navigator.geolocation && S.st === "idle") locate(); }
 function sheetDest() {
  var c = curPos(), SR = window.SpeechRecognition || window.webkitSpeechRecognition;
  var pl = ST.places.length ? '<div class="gps-sh"><b>' + esc(t("savedPl")) + '</b></div><div class="gps-pcs">' + ST.places.map(function (p, i) { return '<button class="gps-pc" data-a="qplace" data-v="' + i + '">' + IC.star + "<span>" + esc(p.n) + '</span><span class="gps-cx" data-a="pdel" data-v="' + i + '" role="button" aria-label="' + esc(t("del")) + '">×</span></button>'; }).join("") + "</div>" : "";
@@ -90872,7 +91010,7 @@ function nearFuel() {
 function tripMsg() {
  var d = parseFloat($("fD").value) || 0, rt = $("fR").checked, dd = rt ? d * 2 : d, m = parseFloat($("fM").value) || 0, p = parseFloat($("fP").value) || 0, l = m > 0 ? dd / m : 0, cost = l * p, pe = Math.max(1, Math.round(parseFloat($("fPe").value) || 1)), c = curPos(), D = ST.dest, link = "";
  var R = function (n) { return n >= 100 ? String(Math.round(n)) : n.toFixed(1); };
- if (D) link = gmUrl([], S.fv, [D.la, D.lo], c); else if (c) link = "https://www.google.com/maps/search/?api=1&query=" + c[0].toFixed(6) + "," + c[1].toFixed(6);
+ if (D) link = gmUrl([], S.fv, [D.la, D.lo], null); else if (c) link = "https://www.google.com/maps/search/?api=1&query=" + c[0].toFixed(6) + "," + c[1].toFixed(6);
  var Ls = ["🧭 *Trip plan* — " + (S.fv === "car" ? "🚗 " : "🏍️ ") + t(S.fv)];
  if (D) Ls.push("📍 " + t("to") + ": " + D.n);
  Ls.push("📏 " + t("dist") + ": " + (dd % 1 ? dd.toFixed(1) : dd) + " km" + (rt ? " (" + t("round") + ")" : ""));
@@ -90963,7 +91101,7 @@ host.addEventListener("click", function (ev) {
  else if (a === "start") start(); else if (a === "pause") pause(); else if (a === "resume") resume(); else if (a === "stop") stop();
  else if (a === "follow") { S.follow = !S.follow; b.className = S.follow ? "on" : ""; if (S.follow) { if (S.map && S.cur) S.map.setView(S.cur, Math.max(S.map.getZoom(), 16)); moveMe(); } }
  else if (a === "fit") { S.follow = false; var fo = $("gpsFol"); if (fo) fo.className = ""; if (S.map) fitAll(); }
- else if (a === "gm") { var c0 = curPos(), u = ST.dest ? gmUrl(S.segs, S.veh, [ST.dest.la, ST.dest.lo], c0) : gmUrl(S.segs, S.veh); if (u) openUrl(u); else if (c0) openUrl("https://www.google.com/maps/search/?api=1&query=" + c0[0] + "," + c0[1]); else toast(t("search")); }
+ else if (a === "gm") { var c0 = curPos(), u = ST.dest ? "" : gmUrl(S.segs, S.veh); if (ST.dest) navSheet(ST.dest.la, ST.dest.lo, ST.dest.n); else if (u) openUrl(u); else if (c0) openUrl("https://www.google.com/maps/search/?api=1&query=" + c0[0] + "," + c0[1]); else toast(t("search")); }
  else if (a === "wake") { if (!S.wl) wake(); }
  else if (a === "settings") openSettings(); else if (a === "smode") { ST.mode = v; saveSt(); openSettings(); } else if (a === "sarr") { ST.arr = +v; saveSt(); openSettings(); } else if (a === "calrst") { delete ST.cal[v]; saveSt(); openSettings(); paintAll(); }
  else if (a === "dest") openDest(); else if (a === "dclr") clearDest();
@@ -91004,7 +91142,7 @@ var lc = $("lang-cycle"); if (lc) lc.addEventListener("click", function () { set
 window.gpsTrackerOnShow = function () { if (!root.firstChild) build(); else { paintResume(); if (S.tab === "track") { drawVeh(); drawCtl(); drawDest(); paintAll(); setTimeout(function () { if (S.map) { S.map.invalidateSize(); moveMe(); } else mapInit(); }, 60); if (ST.dest && S.st === "idle") ensureDest(); } } livePill(); };
 setInterval(livePill, 2000);
 host.addEventListener("click", function (ev) {
- var b = ev.target.closest("[data-a]"); if (!b || !host.contains(b)) return; var a = b.dataset.a;
+ var b = ev.target.closest("[data-a]"); if (!b || !host.contains(b)) return; var a = b.dataset.a; if (a === "start") S.spH = [];
  if (a === "mloc") { S.follow = true; var f = $("gpsFol"); if (f) f.className = "on"; if (S.cur && S.map) { S.map.setView(S.cur, Math.max(S.map.getZoom(), 16)); moveMe(); } else autoLoc(true); }
  else if (a === "mlay") { var lp = $("gpsLp"); if (!lp) return; if (lp.classList.contains("on")) { lp.classList.remove("on"); return; } lp.innerHTML = Object.keys(TL).map(function (k) { return '<button data-a="mlset" data-v="' + k + '" class="' + ((TL[ST.ml] ? ST.ml : "map") === k ? "on" : "") + '">' + TL[k][5] + " " + TL[k][3] + "</button>"; }).join(""); lp.classList.add("on"); }
  else if (a === "mlset") { ST.ml = b.dataset.v; saveSt(); setTiles(); var lp2 = $("gpsLp"); if (lp2) lp2.classList.remove("on"); }
@@ -91018,9 +91156,14 @@ host.addEventListener("click", function (ev) {
  else if (a === "fshare") { window.open("https://wa.me/?text=" + encodeURIComponent(tripMsg()), "_blank", "noopener"); }
  else if (a === "fcopy") { var tx = tripMsg(); try { navigator.clipboard.writeText(tx).then(function () { toast(t("copied"), "success"); }, function () { toast(tx, "info"); }); } catch (e) { toast(tx, "info"); } }
  else if (a === "fnear") nearFuel();
- else if (a === "fnav") { var fr = S.fn && S.fn.list && S.fn.list[+b.dataset.v]; if (fr) openUrl(gmUrl([], S.fv, [fr.la, fr.lo], curPos())); }
+ else if (a === "fnav") { var fr = S.fn && S.fn.list && S.fn.list[+b.dataset.v]; if (fr) navSheet(fr.la, fr.lo, fr.n); }
  else if (a === "fset") { var fs = S.fn && S.fn.list && S.fn.list[+b.dataset.v]; if (fs) { setDest({ n: fs.n, la: fs.la, lo: fs.lo }); toast(t("destSet"), "success"); fuelTab(); } }
+ else if (a === "vgtoggle") { ST.vg = ST.vg === false; saveSt(); paintTurn(); if (ST.vg) speakNow(lg() === "hi" ? "आवाज़ गाइडेंस चालू" : "Voice guidance on"); else { try { window.speechSynthesis.cancel(); } catch (e) {} } }
  else if (a === "fmp") { $("fM").value = b.dataset.v; calcFuel(); }
+ else if (a === "navgo") { var nt = S.navT; if (!nt) return; var vk = S.tab === "fuel" ? S.fv : S.veh, cc = curPos(), kk = b.dataset.v, wu = gmUrl([], vk, [nt.la, nt.lo], null);
+  var ou = "https://www.openstreetmap.org/directions?engine=" + (vk === "walk" ? "fossgis_osrm_foot" : "fossgis_osrm_car") + "&route=" + encodeURIComponent((cc ? cc[0] + "," + cc[1] : "") + ";" + nt.la + "," + nt.lo), tu = kk === "osm" ? ou : wu;
+  if (kk === "app" && /Android/i.test(navigator.userAgent)) tu = "intent://maps.google.com/maps?daddr=" + nt.la + "," + nt.lo + "&directionsmode=" + V[vk].gm + "#Intent;scheme=https;package=com.google.android.apps.maps;S.browser_fallback_url=" + encodeURIComponent(ou) + ";end";
+  closeSheet(); var an = document.createElement("a"); an.href = tu; an.target = "_blank"; an.rel = "noopener"; document.body.appendChild(an); an.click(); an.remove(); }
 });
 host.addEventListener("input", function (ev) {
  if (ev.target.id !== "gpsQ") return; var v = ev.target.value, x = $("gpsQx"); if (x) x.style.display = v ? "" : "none"; clearTimeout(sTimer); var q = v.trim();

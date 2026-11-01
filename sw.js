@@ -3,8 +3,11 @@
  * What it does:
  *  1. OFFLINE: pre-caches the app shell and runtime-caches the CDN libraries
  *     and fonts, so the app opens with no network (shop counters, bad signal).
- *     Pages are network-first (you always get the newest version when online),
- *     with the cached copy as fallback.
+ *     The app page is served instantly from cache and refreshed in the background
+ *     (stale-while-revalidate): a 6 MB page no longer has to download before the app
+ *     opens. When a newer version is found the page is told (SW_UPDATE_READY) so it can
+ *     offer a one-tap refresh. CDN libraries, fonts and the Firebase SDK files are
+ *     cached too, so they also work with no network.
  *  2. REMINDERS (unchanged contract): mirrors the To-Do list into IndexedDB and
  *     notifies for due tasks via Periodic Background Sync / one-off Sync / CHECK_NOW.
  *  3. LOAN EMI REMINDERS (new): the page mirrors My Loans here (SYNC_LOANS); we notify
@@ -21,7 +24,7 @@
  * Nothing here sends data off the device.
  */
 
-const VERSION = "2.0.0";
+const VERSION = "3.0.0";
 const SHELL_CACHE = `smartcalc-shell-${VERSION}`;
 const RUNTIME_CACHE = `smartcalc-runtime-${VERSION}`;
 const RUNTIME_MAX_ENTRIES = 80;
@@ -33,10 +36,13 @@ const SHELL_FILES = [
   "./icon-monochrome-512.png", "./apple-touch-icon.png"
 ];
 const SHELL_PATHS = new Set(SHELL_FILES.map((f) => new URL(f, self.location.href).pathname));
-// Cross-origin hosts safe to cache (static libs + fonts only — never APIs / Firebase).
-const CACHEABLE_HOSTS = new Set([
-  "cdnjs.cloudflare.com", "cdn.jsdelivr.net", "fonts.googleapis.com", "fonts.gstatic.com"
-]);
+// Cross-origin static files that are safe to cache (never APIs / Firestore / Auth).
+// Versioned, never-changing files: cache-first (no re-download, works offline).
+const IMMUTABLE_HOSTS = new Set(["cdnjs.cloudflare.com", "cdn.jsdelivr.net", "fonts.gstatic.com"]);
+// Font CSS can change: stale-while-revalidate.
+const REVALIDATE_HOSTS = new Set(["fonts.googleapis.com"]);
+// Firebase SDK files (versioned ES modules) live on www.gstatic.com/firebasejs/.
+const isFirebaseSdk = (url) => url.hostname === "www.gstatic.com" && url.pathname.startsWith("/firebasejs/");
 
 /* ---------------- IndexedDB (todos + loans + meta) ---------------- */
 const DB_NAME = "smartcalc_todo_sw_db";
@@ -231,27 +237,75 @@ async function trimCache(name, max) {
   const keys = await cache.keys();
   for (let i = 0; i < keys.length - max; i++) await cache.delete(keys[i]);
 }
-async function networkFirstNav(req) {
+const INDEX_URL = "./index.html";
+const APP_ROOT = new URL("./", self.location.href).pathname;
+// Only the app page itself is served from the shell cache (other pages go straight to the network).
+const isAppNav = (url) => url.pathname === APP_ROOT || url.pathname === APP_ROOT + "index.html";
+const signature = (res) => (res && (res.headers.get("etag") || res.headers.get("last-modified") || res.headers.get("content-length"))) || "";
+// Cross-origin files are fetched with CORS so the cache stores real, small responses
+// (opaque ones are counted as ~7 MB each by the browser's storage quota).
+async function corsFetch(req) {
+  try { return await fetch(req.url, { mode: "cors", credentials: "omit" }); }
+  catch (e) { return fetch(req); }
+}
+async function notifyClients(msg) {
+  (await self.clients.matchAll({ type: "window" })).forEach((c) => c.postMessage(msg));
+}
+
+// Quietly checks for a newer index.html (a cheap conditional request: usually "304 not modified").
+// If it changed, store it and tell the open page so it can offer a refresh.
+async function revalidateIndex() {
+  try {
+    const cache = await caches.open(SHELL_CACHE);
+    const old = await cache.match(INDEX_URL, { ignoreSearch: true });
+    const res = await fetch(new Request(INDEX_URL, { cache: "no-cache" }));
+    if (!res || res.status !== 200) return false;
+    if (old) {
+      const a = signature(old), b = signature(res);
+      if (a && b) { if (a === b) return false; }
+      else {
+        const [x, y] = await Promise.all([old.clone().arrayBuffer(), res.clone().arrayBuffer()]);
+        if (x.byteLength === y.byteLength) return false;
+      }
+    }
+    await cache.put(INDEX_URL, res.clone());
+    if (old) await notifyClients({ type: "SW_UPDATE_READY", version: VERSION });
+    return true;
+  } catch (e) { return false; }
+}
+
+async function appNavigation(event) {
   const cache = await caches.open(SHELL_CACHE);
+  const hit = await cache.match(INDEX_URL, { ignoreSearch: true });
+  if (hit) { event.waitUntil(revalidateIndex()); return hit; } // instant start, update in background
   try {
     const res = await Promise.race([
-      fetch(req),
-      new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), NAV_TIMEOUT_MS))
+      fetch(event.request),
+      new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), NAV_TIMEOUT_MS * 6))
     ]);
-    if (res && res.ok) cache.put("./index.html", res.clone());
+    if (res && res.ok) cache.put(INDEX_URL, res.clone());
     return res;
   } catch (e) {
-    return (await cache.match("./index.html", { ignoreSearch: true })) ||
-      new Response("<h1>Offline</h1><p>Open the app once online to enable offline use.</p>",
-        { status: 503, headers: { "Content-Type": "text/html; charset=utf-8" } });
+    return new Response("<h1>Offline</h1><p>Open the app once online to enable offline use.</p>",
+      { status: 503, headers: { "Content-Type": "text/html; charset=utf-8" } });
   }
 }
-async function staleWhileRevalidate(req, cacheName) {
+
+async function cacheFirst(req) {
+  const cache = await caches.open(RUNTIME_CACHE);
+  const hit = await cache.match(req.url);
+  if (hit) return hit;
+  let res;
+  try { res = await corsFetch(req); } catch (e) { return Response.error(); }
+  if (res && res.ok) { cache.put(req.url, res.clone()); trimCache(RUNTIME_CACHE, RUNTIME_MAX_ENTRIES); }
+  return res;
+}
+async function staleWhileRevalidate(req, cacheName, cors) {
   const cache = await caches.open(cacheName);
-  const hit = await cache.match(req, { ignoreSearch: false });
-  const refresh = fetch(req).then((res) => {
-    if (res && (res.ok || res.type === "opaque")) {
-      cache.put(req, res.clone());
+  const hit = await cache.match(req.url);
+  const refresh = (cors ? corsFetch(req) : fetch(req)).then((res) => {
+    if (res && res.ok) {
+      cache.put(req.url, res.clone());
       if (cacheName === RUNTIME_CACHE) trimCache(RUNTIME_CACHE, RUNTIME_MAX_ENTRIES);
     }
     return res;
@@ -264,12 +318,13 @@ self.addEventListener("fetch", (event) => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.pathname.includes("fcm-push-scope") || url.pathname.endsWith("firebase-messaging-sw.js")) return;
-  if (req.mode === "navigate" && url.origin === self.location.origin) {
-    event.respondWith(networkFirstNav(req));
-  } else if (url.origin === self.location.origin) {
-    if (SHELL_PATHS.has(url.pathname)) event.respondWith(staleWhileRevalidate(req, SHELL_CACHE));
-  } else if (CACHEABLE_HOSTS.has(url.hostname)) {
-    event.respondWith(staleWhileRevalidate(req, RUNTIME_CACHE));
+  if (url.origin === self.location.origin) {
+    if (req.mode === "navigate") { if (isAppNav(url)) event.respondWith(appNavigation(event)); }
+    else if (SHELL_PATHS.has(url.pathname)) event.respondWith(staleWhileRevalidate(req, SHELL_CACHE, false));
+  } else if (IMMUTABLE_HOSTS.has(url.hostname) || isFirebaseSdk(url)) {
+    event.respondWith(cacheFirst(req));
+  } else if (REVALIDATE_HOSTS.has(url.hostname)) {
+    event.respondWith(staleWhileRevalidate(req, RUNTIME_CACHE, true));
   }
 });
 
@@ -290,6 +345,8 @@ self.addEventListener("message", (event) => {
     event.waitUntil(checkAndNotify());
   } else if (msg.type === "CHECK_LOANS") {
     event.waitUntil(notifyLoans().then(updateBadge).catch(() => {}));
+  } else if (msg.type === "CHECK_UPDATE") {
+    event.waitUntil(revalidateIndex());
   } else if (msg.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
